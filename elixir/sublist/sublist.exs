@@ -1,5 +1,4 @@
 defmodule Sublist do
-  defp _compare(_, [], [], _b2), do: :unequal
   defp _compare([], _b, _a2, _b2), do: :sublist
   defp _compare(_a, [], _a2, _b2), do: :unequal
 
