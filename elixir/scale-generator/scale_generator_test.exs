@@ -80,6 +80,9 @@ defmodule ScaleGeneratorTest do
     assert ScaleGenerator.step(~w(C C# D D# E F F# G G# A A# B), "C", "m") == "C#"
     assert ScaleGenerator.step(~w(C C# D D# E F F# G G# A A# B), "C", "M") == "D"
     assert ScaleGenerator.step(~w(C C# D D# E F F# G G# A A# B), "C", "A") == "D#"
+
+    assert ScaleGenerator.step(~w(C C# D D# E F F# G G# A A# B), "D", "m") == "D#"
+    assert ScaleGenerator.step(~w(C C# D D# E F F# G G# A A# B), "B", "A") == "D"
   end
 
   test "generate scale from tonic and pattern" do

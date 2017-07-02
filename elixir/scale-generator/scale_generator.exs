@@ -15,12 +15,8 @@ defmodule ScaleGenerator do
     chromatic_scale(tonic) |> to_notation(tonic)
   end
 
-  def step(_scale, _tonic, step) do
-    case step do
-      "m" -> "C#"
-      "M" -> "D"
-      "A" -> "D#"
-    end
+  def step(scale, tonic, step) do
+    scale |> rotate_to_tonic(tonic, []) |> advance(step) |> hd
   end
 
   def scale(tonic, pattern) do
@@ -39,16 +35,16 @@ defmodule ScaleGenerator do
 
   defp _scale(_, [], acc), do: Enum.reverse(acc)
 
-  defp _scale([current_note | notes], [step | steps], acc) do
+  defp _scale(notes, [step | steps], acc) do
     next_notes = advance(notes, step)
-    _scale(next_notes, steps, [current_note | acc])
+    _scale(next_notes, steps, [hd(notes) | acc])
   end
 
   defp advance(notes, step) do
     case step do
-      "m" -> Enum.drop(notes, 0)
-      "M" -> Enum.drop(notes, 1)
-      "A" -> Enum.drop(notes, 2)
+      "m" -> Enum.drop(notes, 1)
+      "M" -> Enum.drop(notes, 2)
+      "A" -> Enum.drop(notes, 3)
     end
   end
 
