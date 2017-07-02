@@ -15,16 +15,26 @@ defmodule ScaleGenerator do
     rotate_to_tonic(@chromatic_c, tonic, [])
   end
 
+  def flat_chromatic_scale(tonic \\ "C") do
+    chromatic_scale(tonic) |> flatten_scale
+  end
+
+  def find_chromatic_scale(tonic) do
+    case tonic in ~w[F Bb Eb Ab Db Gb d g c f bb eb] do
+      true -> flat_chromatic_scale(tonic)
+      false -> chromatic_scale(tonic)
+    end
+  end
+
+  def scale(_tonic, _pattern) do
+  end
+
   defp rotate_to_tonic([tonic | right], tonic, left) do
     [tonic | right] ++ Enum.reverse(left) ++ [tonic]
   end
 
   defp rotate_to_tonic([note | right], tonic, left) do
     rotate_to_tonic(right, tonic, [note | left])
-  end
-
-  def flat_chromatic_scale(tonic \\ "C") do
-    chromatic_scale(tonic) |> flatten_scale
   end
 
   defp flatten_scale(scale) do
@@ -63,12 +73,6 @@ defmodule ScaleGenerator do
 
   defp next_note(note) do
     chromatic_scale(note) |> Enum.at(1)
-  end
-
-  def find_chromatic_scale(_tonic) do
-  end
-
-  def scale(_tonic, _pattern) do
   end
 end
 
