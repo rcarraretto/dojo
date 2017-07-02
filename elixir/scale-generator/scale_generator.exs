@@ -45,15 +45,8 @@ defmodule Scale do
   end
 
   def rotate(notes, note) do
-    rotate_to_target(notes, note, [])
-  end
-
-  defp rotate_to_target([target | right], target, left) do
-    [target | right] ++ Enum.reverse(left) ++ [target]
-  end
-
-  defp rotate_to_target([note | right], target, left) do
-    rotate_to_target(right, target, [note | left])
+    {left, right} = Enum.split_while(notes, &(&1 != note))
+    right ++ left ++ [note]
   end
 
 
