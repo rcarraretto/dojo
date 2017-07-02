@@ -1,48 +1,41 @@
 defmodule ScaleGenerator do
 
+  @chromatic_sharp ~w(C C# D D# E F F# G G# A A# B)
+  @chromatic_flat ~w(C Db D Eb E F Gb G Ab A Bb B)
+  @flat_tonics ~w[F Bb Eb Ab Db Gb d g c f bb eb]
+
   def scale(tonic, pattern) do
     find_chromatic_scale(tonic) |> Scale.filter_pattern(pattern)
   end
 
   def find_chromatic_scale(tonic) do
-    chromatic_scale(tonic) |> Scale.to_notation(tonic)
+    case tonic in @flat_tonics do
+      true -> flat_chromatic_scale(tonic)
+      false -> chromatic_scale(tonic)
+    end
   end
 
   def flat_chromatic_scale(tonic \\ "C") do
-    chromatic_scale(tonic) |> Scale.flat_notation
+    note = Note.from_tonic(tonic)
+    Scale.rotate(@chromatic_flat, note)
   end
 
   def chromatic_scale(tonic \\ "C") do
-    tonic |> Note.from_tonic |> Scale.chromatic
+    note = Note.from_tonic(tonic)
+    Scale.rotate(@chromatic_sharp, note)
   end
 
   def step(scale, tonic, step) do
     note = Note.from_tonic(tonic)
-    scale |> Scale.rotate(note) |> Scale.advance(step) |> hd
+    Scale.rotate(scale, note)
+      |> Scale.advance(step)
+      |> hd
   end
 end
 
 defmodule Scale do
 
-  @chromatic_notes ~w(C C# D D# E F F# G G# A A# B)
-  @flat_tonics ~w[F Bb Eb Ab Db Gb d g c f bb eb]
   @step_distances %{ "m" => 1, "M" => 2, "A" => 3 }
-
-  def to_notation(notes, tonic) do
-    case tonic in @flat_tonics do
-      true -> notes |> flat_notation
-      false -> notes
-    end
-  end
-
-  def flat_notation(notes) do
-    notes |> Enum.map(&Note.flat_notation/1)
-  end
-
-
-  def chromatic(note) do
-    rotate(@chromatic_notes, Note.sharp_notation(note))
-  end
 
   def rotate(notes, note) do
     {left, right} = Enum.split_while(notes, &(&1 != note))
@@ -71,39 +64,5 @@ defmodule Note do
 
   def from_tonic(tonic) do
     String.capitalize(tonic)
-  end
-
-  def flat_notation(note) do
-    case sharp?(note) do
-      true -> next(note) <> "b"
-      false -> note
-    end
-  end
-
-  def sharp_notation(note) do
-    case flat?(note) do
-      true -> note |> natural |> prev
-      false -> note
-    end
-  end
-
-  defp sharp?(note) do
-    String.ends_with?(note, "#")
-  end
-
-  defp flat?(note) do
-    String.ends_with?(note, "b")
-  end
-
-  defp natural(note) do
-    String.slice(note, 0, 1)
-  end
-
-  defp prev(note) do
-    Scale.chromatic(note) |> Enum.at(-2)
-  end
-
-  defp next(note) do
-    Scale.chromatic(note) |> Enum.at(1)
   end
 end

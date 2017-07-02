@@ -27,8 +27,6 @@ defmodule ScaleGeneratorTest do
     assert ScaleGenerator.chromatic_scale("A") == ~w(A A# B C C# D D# E F F# G G# A)
     assert ScaleGenerator.chromatic_scale("G") == ~w(G G# A A# B C C# D D# E F F# G)
     assert ScaleGenerator.chromatic_scale("f#") == ~w(F# G G# A A# B C C# D D# E F F#)
-    assert ScaleGenerator.chromatic_scale("Gb") == ~w(F# G G# A A# B C C# D D# E F F#)
-    assert ScaleGenerator.chromatic_scale("Bb") == ~w(A# B C C# D D# E F F# G G# A A#)
     assert ScaleGenerator.chromatic_scale("B") == ~w(B C C# D D# E F F# G G# A A# B)
   end
 
@@ -36,7 +34,6 @@ defmodule ScaleGeneratorTest do
     assert ScaleGenerator.flat_chromatic_scale("C") == ~w(C Db D Eb E F Gb G Ab A Bb B C)
     assert ScaleGenerator.flat_chromatic_scale("A") == ~w(A Bb B C Db D Eb E F Gb G Ab A)
     assert ScaleGenerator.flat_chromatic_scale("G") == ~w(G Ab A Bb B C Db D Eb E F Gb G)
-    assert ScaleGenerator.flat_chromatic_scale("f#") == ~w(Gb G Ab A Bb B C Db D Eb E F Gb)
     assert ScaleGenerator.flat_chromatic_scale("Gb") == ~w(Gb G Ab A Bb B C Db D Eb E F Gb)
     assert ScaleGenerator.flat_chromatic_scale("Bb") == ~w(Bb B C Db D Eb E F Gb G Ab A Bb)
     assert ScaleGenerator.flat_chromatic_scale("B") == ~w(B C Db D Eb E F Gb G Ab A Bb B)
