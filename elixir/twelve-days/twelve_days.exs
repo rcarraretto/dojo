@@ -29,7 +29,7 @@ defmodule TwelveDays do
     12 => "twelve",
   }
 
-  @items [
+  @gifts [
     "Partridge in a Pear Tree",
     "Turtle Doves",
     "French Hens",
@@ -53,28 +53,28 @@ defmodule TwelveDays do
   end
 
   def verse(number) do
-    "#{on_the_day(number)} my true love gave to me, #{items(number)}."
+    "#{on_the_day(number)} my true love gave to me, #{gifts(number)}."
   end
 
   defp on_the_day(number) do
     "On the #{@ordinals[number]} day of Christmas"
   end
 
-  defp items(number) do
-    @items
+  defp gifts(number) do
+    @gifts
       |> Enum.take(number)
-      |> add_quantity
+      |> with_quantity
       |> Enum.reverse
       |> comma_separated
   end
 
-  defp add_quantity(items) do
-    items
+  defp with_quantity(gifts) do
+    gifts
       |> Enum.with_index
-      |> Enum.map(fn({ item, index }) -> @quantities[index + 1] <> " " <> item end)
+      |> Enum.map(fn({ gift, index }) -> @quantities[index + 1] <> " " <> gift end)
   end
 
-  defp comma_separated([item]), do: item
+  defp comma_separated([only_one]), do: only_one
   defp comma_separated([before_last, last]) do
     "#{before_last}, and #{last}"
   end
