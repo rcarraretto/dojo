@@ -3,8 +3,8 @@ defmodule ScaleGenerator do
   @chromatic_c ~w(C C# D D# E F F# G G# A A# B)
 
   def chromatic_scale(tonic \\ "C") do
-    tonic = tonic |> String.capitalize |> sharp_notation
-    rotate_to_tonic(@chromatic_c, tonic, [])
+    note = tonic |> String.capitalize |> sharp_notation
+    rotate_to_tonic(@chromatic_c, note, [])
   end
 
   def flat_chromatic_scale(tonic \\ "C") do
@@ -12,10 +12,7 @@ defmodule ScaleGenerator do
   end
 
   def find_chromatic_scale(tonic) do
-    case tonic in ~w[F Bb Eb Ab Db Gb d g c f bb eb] do
-      true -> flat_chromatic_scale(tonic)
-      false -> chromatic_scale(tonic)
-    end
+    chromatic_scale(tonic) |> to_notation(tonic)
   end
 
   def step(_scale, _tonic, step) do
@@ -26,7 +23,33 @@ defmodule ScaleGenerator do
     end
   end
 
-  def scale(_tonic, _pattern) do
+  def scale(tonic, pattern) do
+    note = String.capitalize(tonic)
+    steps = String.codepoints(pattern)
+    scale = chromatic_scale(note) |> _scale(steps, []) |> to_notation(tonic)
+    scale ++ [note]
+  end
+
+  defp to_notation(scale, tonic) do
+    case tonic in ~w[F Bb Eb Ab Db Gb d g c f bb eb] do
+      true -> scale |> flatten_scale
+      false -> scale
+    end
+  end
+
+  defp _scale(_, [], acc), do: Enum.reverse(acc)
+
+  defp _scale([current_note | notes], [step | steps], acc) do
+    next_notes = advance(notes, step)
+    _scale(next_notes, steps, [current_note | acc])
+  end
+
+  defp advance(notes, step) do
+    case step do
+      "m" -> Enum.drop(notes, 0)
+      "M" -> Enum.drop(notes, 1)
+      "A" -> Enum.drop(notes, 2)
+    end
   end
 
   defp rotate_to_tonic([tonic | right], tonic, left) do

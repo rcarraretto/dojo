@@ -8,19 +8,19 @@ ExUnit.configure trace: true, exclude: :pending
 defmodule ScaleGeneratorTest do
   use ExUnit.Case
 
-  # @major_scale_pattern           "MMmMMMm"
-  # @minor_scale_pattern           "MmMMmMM"
-  # @dorian_scale_pattern          "MmMMMmM"
-  # @mixolydian_scale_pattern      "MMmMMmM"
-  # @lydian_scale_pattern          "MMMmMMm"
-  # @phrygian_scale_pattern        "mMMMmMM"
-  # @locrian_scale_pattern         "mMMmMMM"
-  # @harmonic_minor_scale_pattern  "MmMMmAm"
-  # @melodic_minor_scale_pattern   "MmMMMMm"
-  # @octatonic_scale_pattern       "MmMmMmMm"
-  # @hexatonic_scale_pattern       "MMMMMM"
-  # @pentatonic_scale_pattern      "MMAMA"
-  # @enigmatic_scale_pattern       "mAMMMmm"
+  @major_scale_pattern           "MMmMMMm"
+  @minor_scale_pattern           "MmMMmMM"
+  @dorian_scale_pattern          "MmMMMmM"
+  @mixolydian_scale_pattern      "MMmMMmM"
+  @lydian_scale_pattern          "MMMmMMm"
+  @phrygian_scale_pattern        "mMMMmMM"
+  @locrian_scale_pattern         "mMMmMMM"
+  @harmonic_minor_scale_pattern  "MmMMmAm"
+  @melodic_minor_scale_pattern   "MmMMMMm"
+  @octatonic_scale_pattern       "MmMmMmMm"
+  @hexatonic_scale_pattern       "MMMMMM"
+  @pentatonic_scale_pattern      "MMAMA"
+  @enigmatic_scale_pattern       "mAMMMmm"
 
   test "chromatic scale" do
     assert ScaleGenerator.chromatic_scale("C") == ~w(C C# D D# E F F# G G# A A# B C)
@@ -83,20 +83,20 @@ defmodule ScaleGeneratorTest do
   end
 
   test "generate scale from tonic and pattern" do
-    # assert ScaleGenerator.scale("C", @major_scale_pattern) == ~w(C D E F G A B C)
-    # assert ScaleGenerator.scale("G", @major_scale_pattern) == ~w(G A B C D E F# G)
-    # assert ScaleGenerator.scale("f#", @minor_scale_pattern) == ~w(F# G# A B C# D E F#)
-    # assert ScaleGenerator.scale("bb", @minor_scale_pattern) == ~w(Bb C Db Eb F Gb Ab Bb)
-    # assert ScaleGenerator.scale("d", @dorian_scale_pattern) == ~w(D E F G A B C D)
-    # assert ScaleGenerator.scale("Eb", @mixolydian_scale_pattern) == ~w(Eb F G Ab Bb C Db Eb)
-    # assert ScaleGenerator.scale("a", @lydian_scale_pattern) == ~w(A B C# D# E F# G# A)
-    # assert ScaleGenerator.scale("e", @phrygian_scale_pattern) == ~w(E F G A B C D E)
-    # assert ScaleGenerator.scale("g", @locrian_scale_pattern) == ~w(G Ab Bb C Db Eb F G)
-    # assert ScaleGenerator.scale("d", @harmonic_minor_scale_pattern) == ~w(D E F G A Bb Db D)
-    # assert ScaleGenerator.scale("C", @melodic_minor_scale_pattern) == ~w(C D D# F G A B C)
-    # assert ScaleGenerator.scale("C", @octatonic_scale_pattern) == ~w(C D D# F F# G# A B C)
-    # assert ScaleGenerator.scale("Db", @hexatonic_scale_pattern) == ~w(Db Eb F G A B Db)
-    # assert ScaleGenerator.scale("A", @pentatonic_scale_pattern) == ~w(A B C# E F# A)
-    # assert ScaleGenerator.scale("G", @enigmatic_scale_pattern) == ~w(G G# B C# D# F F# G)
+    assert ScaleGenerator.scale("C", @major_scale_pattern) == ~w(C D E F G A B C)
+    assert ScaleGenerator.scale("G", @major_scale_pattern) == ~w(G A B C D E F# G)
+    assert ScaleGenerator.scale("f#", @minor_scale_pattern) == ~w(F# G# A B C# D E F#)
+    assert ScaleGenerator.scale("bb", @minor_scale_pattern) == ~w(Bb C Db Eb F Gb Ab Bb)
+    assert ScaleGenerator.scale("d", @dorian_scale_pattern) == ~w(D E F G A B C D)
+    assert ScaleGenerator.scale("Eb", @mixolydian_scale_pattern) == ~w(Eb F G Ab Bb C Db Eb)
+    assert ScaleGenerator.scale("a", @lydian_scale_pattern) == ~w(A B C# D# E F# G# A)
+    assert ScaleGenerator.scale("e", @phrygian_scale_pattern) == ~w(E F G A B C D E)
+    assert ScaleGenerator.scale("g", @locrian_scale_pattern) == ~w(G Ab Bb C Db Eb F G)
+    assert ScaleGenerator.scale("d", @harmonic_minor_scale_pattern) == ~w(D E F G A Bb Db D)
+    assert ScaleGenerator.scale("C", @melodic_minor_scale_pattern) == ~w(C D D# F G A B C)
+    assert ScaleGenerator.scale("C", @octatonic_scale_pattern) == ~w(C D D# F F# G# A B C)
+    assert ScaleGenerator.scale("Db", @hexatonic_scale_pattern) == ~w(Db Eb F G A B Db)
+    assert ScaleGenerator.scale("A", @pentatonic_scale_pattern) == ~w(A B C# E F# A)
+    assert ScaleGenerator.scale("G", @enigmatic_scale_pattern) == ~w(G G# B C# D# F F# G)
   end
 end
