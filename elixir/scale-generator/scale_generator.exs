@@ -1,40 +1,32 @@
 defmodule ScaleGenerator do
 
-  def chromatic_scale(tonic \\ "C") do
-    tonic |> Note.from_tonic |> Scale.chromatic
-  end
-
-  def flat_chromatic_scale(tonic \\ "C") do
-    tonic |> Note.from_tonic |> Scale.chromatic |> Scale.flat_notation
+  def scale(tonic, pattern) do
+    find_chromatic_scale(tonic) |> Scale.filter_pattern(pattern)
   end
 
   def find_chromatic_scale(tonic) do
-    tonic |> Note.from_tonic |> Scale.chromatic |> Scale.to_notation(tonic)
+    chromatic_scale(tonic) |> Scale.to_notation(tonic)
+  end
+
+  def flat_chromatic_scale(tonic \\ "C") do
+    chromatic_scale(tonic) |> Scale.flat_notation
+  end
+
+  def chromatic_scale(tonic \\ "C") do
+    tonic |> Note.from_tonic |> Scale.chromatic
   end
 
   def step(scale, tonic, step) do
     note = Note.from_tonic(tonic)
     scale |> Scale.rotate(note) |> Scale.advance(step) |> hd
   end
-
-  def scale(tonic, pattern) do
-    note = Note.from_tonic(tonic)
-    steps = String.codepoints(pattern)
-    scale = Scale.chromatic(note) |> _scale(steps, []) |> Scale.to_notation(tonic)
-    scale ++ [note]
-  end
-
-  defp _scale(_, [], acc), do: Enum.reverse(acc)
-
-  defp _scale(notes, [step | steps], acc) do
-    next_notes = Scale.advance(notes, step)
-    _scale(next_notes, steps, [hd(notes) | acc])
-  end
 end
 
 defmodule Scale do
 
-  @chromatic_c ~w(C C# D D# E F F# G G# A A# B)
+  @chromatic_notes ~w(C C# D D# E F F# G G# A A# B)
+
+  @step_distances %{ "m" => 1, "M" => 2, "A" => 3 }
 
   def to_notation(notes, tonic) do
     case tonic in ~w[F Bb Eb Ab Db Gb d g c f bb eb] do
@@ -47,20 +39,13 @@ defmodule Scale do
     notes |> Enum.map(&Note.flat_notation/1)
   end
 
+
   def chromatic(note) do
-    rotate(@chromatic_c, Note.sharp_notation(note))
+    rotate(@chromatic_notes, Note.sharp_notation(note))
   end
 
   def rotate(notes, note) do
     rotate_to_target(notes, note, [])
-  end
-
-  def advance(notes, step) do
-    case step do
-      "m" -> Enum.drop(notes, 1)
-      "M" -> Enum.drop(notes, 2)
-      "A" -> Enum.drop(notes, 3)
-    end
   end
 
   defp rotate_to_target([target | right], target, left) do
@@ -69,6 +54,23 @@ defmodule Scale do
 
   defp rotate_to_target([note | right], target, left) do
     rotate_to_target(right, target, [note | left])
+  end
+
+
+  def filter_pattern(notes, pattern) do
+    steps = String.codepoints(pattern)
+    walk_steps(notes, steps, [])
+  end
+
+  defp walk_steps([note | _], [], acc), do: Enum.reverse(acc) ++ [note]
+
+  defp walk_steps(notes, [step | steps], acc) do
+    next_notes = advance(notes, step)
+    walk_steps(next_notes, steps, [hd(notes) | acc])
+  end
+
+  def advance(notes, step) do
+    Enum.drop(notes, @step_distances[step])
   end
 end
 
