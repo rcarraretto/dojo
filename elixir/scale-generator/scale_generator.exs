@@ -25,11 +25,11 @@ end
 defmodule Scale do
 
   @chromatic_notes ~w(C C# D D# E F F# G G# A A# B)
-
+  @flat_tonics ~w[F Bb Eb Ab Db Gb d g c f bb eb]
   @step_distances %{ "m" => 1, "M" => 2, "A" => 3 }
 
   def to_notation(notes, tonic) do
-    case tonic in ~w[F Bb Eb Ab Db Gb d g c f bb eb] do
+    case tonic in @flat_tonics do
       true -> notes |> flat_notation
       false -> notes
     end
