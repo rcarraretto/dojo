@@ -28,6 +28,6 @@ defmodule Scrabble do
 
   defp char_group(char) do
     @char_groups
-      |> Enum.find(fn({ char_group, _ }) -> Enum.member?(char_group, char) end)
+      |> Enum.find(fn({ char_group, _ }) -> char in char_group end)
   end
 end
