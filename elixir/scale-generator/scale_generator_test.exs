@@ -23,43 +23,26 @@ defmodule ScaleGeneratorTest do
   # @enigmatic_scale_pattern       "mAMMMmm"
 
   describe "step to next note" do
-    #@tag :pending
     test "with half-tone interval" do
       assert ScaleGenerator.step(~w(C C# D D# E F F# G G# A A# B), "C", "m") == "C#"
     end
 
-    # @tag :pending
     test "with full tone interval" do
       assert ScaleGenerator.step(~w(C C# D D# E F F# G G# A A# B), "C", "M") == "D"
     end
 
-    # @tag :pending
     test "with accidental interval" do
       assert ScaleGenerator.step(~w(C C# D D# E F F# G G# A A# B), "C", "A") == "D#"
     end
   end
 
-  # describe "generate chromatic scale" do
-  #   @tag :pending
-  #   test "starting with A" do
-  #     assert ScaleGenerator.chromatic_scale("A") == ~w(A A# B C C# D D# E F F# G G# A)
-  #   end
-
-  #   @tag :pending
-  #   test "starting with C" do
-  #     assert ScaleGenerator.chromatic_scale("C") == ~w(C C# D D# E F F# G G# A A# B C)
-  #   end
-
-  #   @tag :pending
-  #   test "starting with G" do
-  #     assert ScaleGenerator.chromatic_scale("G") == ~w(G G# A A# B C C# D D# E F F# G)
-  #   end
-
-  #   @tag :pending
-  #   test "works with with lowercase notes" do
-  #     assert ScaleGenerator.chromatic_scale("f#") == ~w(F# G G# A A# B C C# D D# E F F#)
-  #   end
-  # end
+  test "chromatic scale" do
+    assert ScaleGenerator.chromatic_scale("C") == ~w(C C# D D# E F F# G G# A A# B C)
+    assert ScaleGenerator.chromatic_scale("A") == ~w(A A# B C C# D D# E F F# G G# A)
+    assert ScaleGenerator.chromatic_scale("G") == ~w(G G# A A# B C C# D D# E F F# G)
+    assert ScaleGenerator.chromatic_scale("f#") == ~w(F# G G# A A# B C C# D D# E F F#)
+    assert ScaleGenerator.chromatic_scale("B") == ~w(B C C# D D# E F F# G G# A A# B)
+  end
 
   # describe "generate flat chromatic scale" do
   #   @tag :pending

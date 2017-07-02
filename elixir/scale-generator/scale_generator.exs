@@ -1,5 +1,7 @@
 defmodule ScaleGenerator do
 
+  @chromatic_c ~w(C C# D D# E F F# G G# A A# B)
+
   def step(_scale, _tonic, step) do
     case step do
       "m" -> "C#"
@@ -8,7 +10,16 @@ defmodule ScaleGenerator do
     end
   end
 
-  def chromatic_scale(_tonic \\ "C") do
+  def chromatic_scale(tonic \\ "C") do
+    rotate_to_tonic(@chromatic_c, String.upcase(tonic), [])
+  end
+
+  defp rotate_to_tonic([tonic | right], tonic, left) do
+    [tonic | right] ++ Enum.reverse(left) ++ [tonic]
+  end
+
+  defp rotate_to_tonic([note | right], tonic, left) do
+    rotate_to_tonic(right, tonic, [note | left])
   end
 
   def flat_chromatic_scale(_tonic \\ "C") do
