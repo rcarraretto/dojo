@@ -10,6 +10,16 @@ defmodule MinesweeperTest do
 
   defp clean(b), do: Enum.map(b, &String.replace(&1, ~r/[^*]/, " "))
 
+  test "diagonals" do
+    b = [
+      ~w[a b c],
+      ~w[d e f],
+      ~w[g h i]
+    ]
+    a = [~w[a e i], ~w[b f], ~w[c], ~w[d h], ~w[g]]
+    assert Minesweeper.diagonals(b) == a
+  end
+
   test "zero size board" do
     b = []
     a = []

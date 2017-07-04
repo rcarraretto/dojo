@@ -24,7 +24,9 @@ defmodule Minesweeper do
 
   defp annotate_matrix(matrix) do
     matrix
-    |> left_and_right
+    |> scan_horizontal
+    |> scan_vertical
+    |> scan_diagonal
     |> Enum.map(&to_board/1)
   end
 
@@ -40,12 +42,20 @@ defmodule Minesweeper do
     |> Enum.join
   end
 
-  defp left_and_right(matrix) do
+  defp scan_horizontal(matrix) do
     matrix
     |> Enum.map(&left_and_right_row/1)
+  end
+
+  defp scan_vertical(matrix) do
+    matrix
     |> transpose
     |> Enum.map(&left_and_right_row/1)
     |> transpose
+  end
+
+  defp scan_diagonal(matrix) do
+    matrix
   end
 
   defp left_and_right_row(row) do
@@ -79,5 +89,36 @@ defmodule Minesweeper do
 
   defp transpose(matrix) do
     List.zip(matrix) |> Enum.map(&Tuple.to_list/1)
+  end
+
+  def diagonals(matrix) do
+    _diagonals(matrix, [])
+  end
+
+  defp _diagonals([], diagonals) do
+    Enum.reverse(diagonals)
+  end
+
+  defp _diagonals(rows, diagonals) do
+    { rows, diagonal } = _diagonal(rows, 0, { [], [] })
+    # IO.inspect rows
+    # IO.inspect diagonal
+    _diagonals(rows, [diagonal | diagonals])
+  end
+
+  defp _diagonal([], _col_index, { new_rows, diagonal }) do
+    diagonal = diagonal |> Enum.filter(fn(x) -> x != nil end)
+    { Enum.reverse(new_rows), Enum.reverse(diagonal) }
+  end
+
+  defp _diagonal([row | rows], col_index, { new_rows, diagonal }) do
+    elem = Enum.at(row, col_index)
+    diagonal = [elem | diagonal]
+    new_row = List.delete_at(row, col_index)
+    new_rows = case Enum.empty?(new_row) do
+      true -> new_rows
+      false -> [new_row | new_rows]
+    end
+    _diagonal(rows, col_index + 1, { new_rows, diagonal })
   end
 end
