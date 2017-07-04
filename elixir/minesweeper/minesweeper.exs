@@ -9,6 +9,17 @@ defmodule Minesweeper do
   defp to_matrix(board) do
     board
     |> Enum.map(fn(row) -> String.codepoints(row) end)
+    |> Enum.map(&init_row/1)
+  end
+
+  defp init_row(row) do
+    row
+    |> Enum.map(fn(x) ->
+      case x == " " do
+        true -> 0
+        false -> x
+      end
+    end)
   end
 
   defp annotate_matrix(matrix) do
@@ -20,9 +31,10 @@ defmodule Minesweeper do
   defp to_board(row) do
     row
     |> Enum.map(fn(x) ->
-      case is_integer(x) do
-        true -> Integer.to_string(x)
-        false -> x
+      cond do
+        x == 0 -> " "
+        is_integer(x) -> Integer.to_string(x)
+        true -> x
       end
     end)
     |> Enum.join
@@ -31,6 +43,9 @@ defmodule Minesweeper do
   defp left_and_right(matrix) do
     matrix
     |> Enum.map(&left_and_right_row/1)
+    |> transpose
+    |> Enum.map(&left_and_right_row/1)
+    |> transpose
   end
 
   defp left_and_right_row(row) do
@@ -51,21 +66,18 @@ defmodule Minesweeper do
   end
 
   defp add_right([x, "*" | tail], acc) do
-    add_right(tail, ["*", inc(x) | acc])
+    add_right(tail, ["*", x + 1 | acc])
   end
 
-  defp add_right([x, " " | tail], acc) do
-    add_right(tail, [x, " " | acc])
+  defp add_right([x, y | tail], acc) do
+    add_right(tail, [y, x | acc])
   end
 
   defp add_left(row) do
     row |> Enum.reverse |> add_right([]) |> Enum.reverse
   end
 
-  defp inc(x) do
-    cond do
-      x == " " -> 1
-      x -> x + 1
-    end
+  defp transpose(matrix) do
+    List.zip(matrix) |> Enum.map(&Tuple.to_list/1)
   end
 end

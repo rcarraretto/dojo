@@ -42,6 +42,20 @@ defmodule MinesweeperTest do
     assert Minesweeper.annotate((b)) == a
   end
 
+  test "vertical line" do
+    b = [" ",
+         "*",
+         " ",
+         "*",
+         " "]
+    a = ["1",
+         "*",
+         "2",
+         "*",
+         "1"]
+    assert Minesweeper.annotate((b)) == a
+  end
+
   @tag :pending
   test "surrounded" do
     b = ["***",
@@ -51,16 +65,6 @@ defmodule MinesweeperTest do
          "*8*",
          "***"]
     assert Minesweeper.annotate((b)) == a
-  end
-
-  @tag :pending
-  test "vertical line" do
-    b = ["1",
-         "*",
-         "2",
-         "*",
-         "1"]
-    assert Minesweeper.annotate(clean(b)) == b
   end
 
   @tag :pending
