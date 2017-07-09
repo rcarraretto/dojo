@@ -10,7 +10,7 @@ defmodule Minesweeper do
     |> to_board()
   end
 
-  def annotate_matrix(matrix) do
+  defp annotate_matrix(matrix) do
     for {i, row} <- matrix do
       annotate_row(matrix, i, row)
     end
