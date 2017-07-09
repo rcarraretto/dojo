@@ -3,25 +3,21 @@ defmodule Minesweeper do
   def annotate(board) do
     board
     |> Enum.map(&String.codepoints/1)
-    |> triples([])
-    |> Enum.map(&annotate_row/1)
+    |> annotate_rows
     |> Enum.map(&Enum.join/1)
   end
 
+  defp annotate_rows(rows) do
+    rows
+    |> Rows.with_adjacents
+    |> Enum.map(&annotate_row/1)
+  end
+
   defp annotate_row({row, adjacent_rows}) do
-    neighbors = all_neighbors({row, adjacent_rows})
+    neighbors = Neighbors.all({row, adjacent_rows})
     [row, neighbors]
     |> List.zip()
     |> Enum.map(&annotate_cell/1)
-  end
-
-  defp all_neighbors({row, adjacent_rows}) do
-    neighbors1 = same_row_neighbors(row)
-    neighbors2 = adjacent_rows |> Enum.map(&adjacent_row_neighbors/1)
-    [neighbors1 | neighbors2]
-    |> List.zip()
-    |> Enum.map(&Tuple.to_list/1)
-    |> Enum.map(&List.flatten/1)
   end
 
   defp annotate_cell({ "*", _neighbors }) do
@@ -32,93 +28,116 @@ defmodule Minesweeper do
     count = Enum.count(neighbors, fn(cell) -> cell == "*" end)
     if count == 0, do: " ", else: count
   end
+end
 
-  defp triples([], acc) do
+defmodule Rows do
+
+  def with_adjacents(rows) do
+    _with_adjacents(rows, [])
+  end
+
+  defp _with_adjacents([], acc) do
     Enum.reverse(acc)
   end
 
   # first and only row
-  defp triples([row], []) do
-    triple = { row, [] }
-    triples([], [triple])
+  defp _with_adjacents([row], []) do
+    row_t = { row, [] }
+    _with_adjacents([], [row_t])
   end
 
   # first row
-  defp triples([row | rows], []) do
-    triple = {row, [hd(rows)]}
-    triples(rows, [triple])
+  defp _with_adjacents([row | rows], []) do
+    row_t = {row, [hd(rows)]}
+    _with_adjacents(rows, [row_t])
   end
 
   # last row
-  defp triples([row], acc) do
+  defp _with_adjacents([row], acc) do
     row_above = elem(hd(acc), 0)
-    triple = {row, [row_above]}
-    triples([], [triple | acc])
+    row_t = {row, [row_above]}
+    _with_adjacents([], [row_t | acc])
   end
 
   # middle row
-  defp triples([row, row_below | rows], acc) do
+  defp _with_adjacents([row, row_below | rows], acc) do
     row_above = elem(hd(acc), 0)
-    triple = {row, [row_above, row_below]}
-    triples([row_below | rows], [triple | acc])
+    row_t = {row, [row_above, row_below]}
+    _with_adjacents([row_below | rows], [row_t | acc])
+  end
+end
+
+defmodule Neighbors do
+
+  def all({row, adjacent_rows}) do
+    [horizontal(row) | verticals(adjacent_rows)]
+    |> List.zip()
+    |> Enum.map(&Tuple.to_list/1)
+    |> Enum.map(&List.flatten/1)
   end
 
 
-  def same_row_neighbors(row) do
-    row |> _assemble_row([])
+  defp horizontal(row) do
+    row
+    |> _horizontal([])
     |> Enum.map(fn({ _cell, neighbors }) -> neighbors end)
   end
 
-  defp _assemble_row([], acc) do
+  defp _horizontal([], acc) do
     Enum.reverse(acc)
   end
 
-  defp _assemble_row([cell], [{prev_cell, prev_neighbors} | acc]) do
+  defp _horizontal([cell], [{prev_cell, prev_neighbors} | acc]) do
     neighbors = [prev_cell]
     t = {cell, neighbors}
-    _assemble_row([], [t, {prev_cell, prev_neighbors} | acc])
+    _horizontal([], [t, {prev_cell, prev_neighbors} | acc])
   end
 
-  defp _assemble_row([cell | cells], []) do
+  defp _horizontal([cell | cells], []) do
     neighbors = if Enum.empty?(cells), do: [], else: [hd(cells)]
     t = {cell, neighbors}
-    _assemble_row(cells, [t])
+    _horizontal(cells, [t])
   end
 
-  defp _assemble_row([cell | cells], [{prev_cell, prev_neighbors} | acc]) do
+  defp _horizontal([cell | cells], [{prev_cell, prev_neighbors} | acc]) do
     neighbors = [prev_cell, hd(cells)]
     t = {cell, neighbors}
-    _assemble_row(cells, [t, {prev_cell, prev_neighbors} | acc])
+    _horizontal(cells, [t, {prev_cell, prev_neighbors} | acc])
   end
 
-  def adjacent_row_neighbors(row) do
-    row |> _assemble_adjacent([])
+
+  defp verticals(rows) do
+    Enum.map(rows, &vertical/1)
   end
 
-  defp _assemble_adjacent([], acc) do
+  defp vertical(row) do
+    row |> _vertical([])
+  end
+
+  defp _vertical([], acc) do
     Enum.reverse(acc)
   end
 
   # first cell
-  defp _assemble_adjacent([cell | cells], []) do
+  defp _vertical([cell | cells], []) do
     neighbors = if Enum.empty?(cells), do: [cell], else: [cell, hd(cells)]
-    _assemble_adjacent(cells, [neighbors])
+    _vertical(cells, [neighbors])
   end
 
   # last cell
-  defp _assemble_adjacent([cell], acc) do
+  defp _vertical([cell], acc) do
     prev_neighbors = hd(acc)
     prev_cell = List.last(prev_neighbors)
     neighbors = [prev_cell, cell]
-    _assemble_adjacent([], [neighbors | acc])
+    _vertical([], [neighbors | acc])
   end
 
   # middle cell
-  defp _assemble_adjacent([cell | cells], acc) do
+  defp _vertical([cell | cells], acc) do
     prev_neighbors = hd(acc)
     prev_cell_index = if length(prev_neighbors) == 2, do: 0, else: 1
     prev_cell = Enum.at(prev_neighbors, prev_cell_index)
     neighbors = [prev_cell, cell, hd(cells)]
-    _assemble_adjacent(cells, [neighbors | acc])
+    _vertical(cells, [neighbors | acc])
   end
 end
