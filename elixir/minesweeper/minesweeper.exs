@@ -2,24 +2,9 @@ defmodule Minesweeper do
 
   def annotate(board) do
     board
-    |> to_matrix
+    |> BoardMatrix.init
     |> annotate_matrix
-  end
-
-  defp to_matrix(board) do
-    board
-    |> Enum.map(fn(row) -> String.codepoints(row) end)
-    |> Enum.map(&init_row/1)
-  end
-
-  defp init_row(row) do
-    row
-    |> Enum.map(fn(x) ->
-      case x == " " do
-        true -> 0
-        false -> x
-      end
-    end)
+    |> BoardMatrix.to_board
   end
 
   defp annotate_matrix(matrix) do
@@ -27,19 +12,6 @@ defmodule Minesweeper do
     |> scan_horizontal
     |> scan_vertical
     |> scan_diagonal
-    |> Enum.map(&to_board/1)
-  end
-
-  defp to_board(row) do
-    row
-    |> Enum.map(fn(x) ->
-      cond do
-        x == 0 -> " "
-        is_integer(x) -> Integer.to_string(x)
-        true -> x
-      end
-    end)
-    |> Enum.join
   end
 
   defp scan_horizontal(matrix) do
@@ -119,5 +91,39 @@ defmodule Minesweeper do
 
   defp transpose(matrix) do
     List.zip(matrix) |> Enum.map(&Tuple.to_list/1)
+  end
+end
+
+defmodule BoardMatrix do
+
+  def init(board) do
+    board |> Enum.map(&init_row/1)
+  end
+
+  defp init_row(row) do
+    row |> String.codepoints |> Enum.map(&init_cell/1)
+  end
+
+  defp init_cell(cell) do
+    case cell == " " do
+      true -> 0
+      false -> cell
+    end
+  end
+
+  def to_board(matrix) do
+    matrix |> Enum.map(&to_board_row/1)
+  end
+
+  defp to_board_row(row) do
+    row |> Enum.map(&to_board_cell/1) |> Enum.join
+  end
+
+  defp to_board_cell(cell) do
+    cond do
+      cell == 0 -> " "
+      is_integer(cell) -> Integer.to_string(cell)
+      true -> cell
+    end
   end
 end
