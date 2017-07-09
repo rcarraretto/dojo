@@ -10,33 +10,6 @@ defmodule MinesweeperTest do
 
   defp clean(b), do: Enum.map(b, &String.replace(&1, ~r/[^*]/, " "))
 
-  test "assembling" do
-    row = [" ", "*", " ", "*", " "]
-    a1 = [
-      ["*"],
-      [" ", " "],
-      ["*", "*"],
-      [" ", " "],
-      ["*"],
-    ]
-    assert Minesweeper.same_row_neighbors(row) == a1
-    row2 = ["*", " ", "*", " ", " "]
-    a2 = [
-      ["*", " "],
-      ["*", " ", "*"],
-      [" ", "*", " "],
-      ["*", " ", " "],
-      [" ", " "],
-    ]
-    assert Minesweeper.adjacent_row_neighbors(row2) == a2
-    assert Minesweeper.adjacent_row_neighbors(["*"]) == [["*"]]
-    assert Minesweeper.same_row_neighbors([" "]) == [[]]
-  end
-
-  test "annotate row" do
-    assert Minesweeper.annotate_row([[" "], ["*"]]) == [1]
-  end
-
   test "zero size board" do
     b = []
     a = []

@@ -8,34 +8,20 @@ defmodule Minesweeper do
     |> Enum.map(&Enum.join/1)
   end
 
-  def annotate_row([row]) do
-    neighbors = same_row_neighbors(row)
-    base_annotate(row, neighbors)
-  end
-
-  def annotate_row([row, row_below]) do
-    neighbors1 = same_row_neighbors(row)
-    neighbors2 = adjacent_row_neighbors(row_below)
-    neighbors = all_neighbors([neighbors1, neighbors2])
-    base_annotate(row, neighbors)
-  end
-
-  def annotate_row([row, row_above, row_below]) do
-    neighbors1 = same_row_neighbors(row)
-    neighbors2 = adjacent_row_neighbors(row_above)
-    neighbors3 = adjacent_row_neighbors(row_below)
-    neighbors = all_neighbors([neighbors1, neighbors2, neighbors3])
-    base_annotate(row, neighbors)
-  end
-
-  defp all_neighbors(list) do
-    list |> List.zip |> Enum.map(&Tuple.to_list/1) |> Enum.map(&List.flatten/1)
-  end
-
-  defp base_annotate(row, neighbors) do
-    cells = List.zip([row, neighbors])
-    cells
+  defp annotate_row({row, adjacent_rows}) do
+    neighbors = all_neighbors({row, adjacent_rows})
+    [row, neighbors]
+    |> List.zip()
     |> Enum.map(&annotate_cell/1)
+  end
+
+  defp all_neighbors({row, adjacent_rows}) do
+    neighbors1 = same_row_neighbors(row)
+    neighbors2 = adjacent_rows |> Enum.map(&adjacent_row_neighbors/1)
+    [neighbors1 | neighbors2]
+    |> List.zip()
+    |> Enum.map(&Tuple.to_list/1)
+    |> Enum.map(&List.flatten/1)
   end
 
   defp annotate_cell({ "*", _neighbors }) do
@@ -53,27 +39,27 @@ defmodule Minesweeper do
 
   # first and only row
   defp triples([row], []) do
-    triple = [row]
+    triple = { row, [] }
     triples([], [triple])
   end
 
   # first row
   defp triples([row | rows], []) do
-    triple = [row, hd(rows)]
+    triple = {row, [hd(rows)]}
     triples(rows, [triple])
   end
 
   # last row
   defp triples([row], acc) do
-    row_above = hd(hd(acc))
-    triple = [row, row_above]
+    row_above = elem(hd(acc), 0)
+    triple = {row, [row_above]}
     triples([], [triple | acc])
   end
 
   # middle row
   defp triples([row, row_below | rows], acc) do
-    row_above = hd(hd(acc))
-    triple = [row, row_above, row_below]
+    row_above = elem(hd(acc), 0)
+    triple = {row, [row_above, row_below]}
     triples([row_below | rows], [triple | acc])
   end
 
