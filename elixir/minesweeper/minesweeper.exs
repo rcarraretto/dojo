@@ -1,7 +1,47 @@
 defmodule Minesweeper do
 
-  def assemble_row(row) do
+  def annotate(board) do
+    board |> triples([]) |> Enum.map(&annotate_row/1)
+  end
+
+  defp annotate_row([row]) do
+    neighbors = same_row_neighbors(row)
+    List.zip([row |> String.codepoints, neighbors])
+    |> Enum.map(&annotate_cell/1)
+    |> Enum.join
+  end
+
+  defp annotate_cell({ "*", _neighbors }) do
+    "*"
+  end
+
+  defp annotate_cell({ " ", neighbors }) do
+    Enum.count(neighbors, fn(cell) -> cell == "*" end)
+  end
+
+  defp triples([], acc) do
+    Enum.reverse(acc)
+  end
+
+  defp triples([row], acc) do
+    triple = [row]
+    triples([], [triple | acc])
+  end
+
+  defp triples([row1, row2], acc) do
+    triple = [row1, row2]
+    triples([row2], [triple | acc])
+  end
+
+  defp triples([row1, row2, row3 | rows], acc) do
+    triple = [row1, row2, row3]
+    triples([row2, row3 | rows], [triple | acc])
+  end
+
+
+  def same_row_neighbors(row) do
     row |> String.codepoints |> _assemble_row([])
+    |> Enum.map(fn({ _cell, neighbors }) -> neighbors end)
   end
 
   defp _assemble_row([], acc) do
@@ -57,7 +97,4 @@ defmodule Minesweeper do
     _assemble_adjacent(cells, [neighbors | acc])
   end
 
-  def annotate(board) do
-    board
-  end
 end

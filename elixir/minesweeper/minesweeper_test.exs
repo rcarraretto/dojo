@@ -13,20 +13,20 @@ defmodule MinesweeperTest do
   test "assembling" do
     row = " * * "
     a1 = [
-      { " ", ["*"] },
-      { "*", [" ", " "] },
-      { " ", ["*", "*"] },
-      { "*", [" ", " "] },
-      { " ", ["*"] }
+      ["*"],
+      [" ", " "],
+      ["*", "*"],
+      [" ", " "],
+      ["*"],
     ]
-    assert Minesweeper.assemble_row(row) == a1
+    assert Minesweeper.same_row_neighbors(row) == a1
     row2 = "* *  "
     a2 = [
       ["*", " "],
       ["*", " ", "*"],
       [" ", "*", " "],
       ["*", " ", " "],
-      [" ", " "]
+      [" ", " "],
     ]
     assert Minesweeper.adjacent_row_neighbors(row2) == a2
   end
@@ -61,7 +61,6 @@ defmodule MinesweeperTest do
     assert Minesweeper.annotate((b)) == a
   end
 
-  @tag :pending
   test "horizontal line" do
     b = [" * * "]
     a = ["1*2*1"]
