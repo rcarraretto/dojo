@@ -29,6 +29,12 @@ defmodule MinesweeperTest do
       [" ", " "],
     ]
     assert Minesweeper.adjacent_row_neighbors(row2) == a2
+    assert Minesweeper.adjacent_row_neighbors(["*"]) == [["*"]]
+    assert Minesweeper.same_row_neighbors([" "]) == [[]]
+  end
+
+  test "annotate row" do
+    assert Minesweeper.annotate_row([[" "], ["*"]]) == [1]
   end
 
   test "zero size board" do
@@ -63,7 +69,6 @@ defmodule MinesweeperTest do
     assert Minesweeper.annotate((b)) == a
   end
 
-  @tag :pending
   test "vertical line" do
     b = [" ",
          "*",
@@ -78,7 +83,6 @@ defmodule MinesweeperTest do
     assert Minesweeper.annotate((b)) == a
   end
 
-  @tag :pending
   test "surrounded" do
     b = ["***",
          "* *",
@@ -89,7 +93,6 @@ defmodule MinesweeperTest do
     assert Minesweeper.annotate((b)) == a
   end
 
-  @tag :pending
   test "cross" do
     b = [" 2*2 ",
          "25*52",

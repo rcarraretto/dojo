@@ -8,19 +8,19 @@ defmodule Minesweeper do
     |> Enum.map(&Enum.join/1)
   end
 
-  defp annotate_row([row]) do
+  def annotate_row([row]) do
     neighbors = same_row_neighbors(row)
     base_annotate(row, neighbors)
   end
 
-  defp annotate_row([row, row_below]) do
+  def annotate_row([row, row_below]) do
     neighbors1 = same_row_neighbors(row)
     neighbors2 = adjacent_row_neighbors(row_below)
     neighbors = all_neighbors([neighbors1, neighbors2])
     base_annotate(row, neighbors)
   end
 
-  defp annotate_row([row_above, row, row_below]) do
+  def annotate_row([row, row_above, row_below]) do
     neighbors1 = same_row_neighbors(row)
     neighbors2 = adjacent_row_neighbors(row_above)
     neighbors3 = adjacent_row_neighbors(row_below)
@@ -29,11 +29,12 @@ defmodule Minesweeper do
   end
 
   defp all_neighbors(list) do
-    list |> List.zip |> Enum.map(&Tuple.to_list/1)
+    list |> List.zip |> Enum.map(&Tuple.to_list/1) |> Enum.map(&List.flatten/1)
   end
 
   defp base_annotate(row, neighbors) do
-    List.zip([row, neighbors])
+    cells = List.zip([row, neighbors])
+    cells
     |> Enum.map(&annotate_cell/1)
   end
 
@@ -50,19 +51,30 @@ defmodule Minesweeper do
     Enum.reverse(acc)
   end
 
-  defp triples([row], acc) do
+  # first and only row
+  defp triples([row], []) do
     triple = [row]
+    triples([], [triple])
+  end
+
+  # first row
+  defp triples([row | rows], []) do
+    triple = [row, hd(rows)]
+    triples(rows, [triple])
+  end
+
+  # last row
+  defp triples([row], acc) do
+    row_above = hd(hd(acc))
+    triple = [row, row_above]
     triples([], [triple | acc])
   end
 
-  defp triples([row1, row2], acc) do
-    triple = [row1, row2]
-    triples([row2], [triple | acc])
-  end
-
-  defp triples([row1, row2, row3 | rows], acc) do
-    triple = [row1, row2, row3]
-    triples([row2, row3 | rows], [triple | acc])
+  # middle row
+  defp triples([row, row_below | rows], acc) do
+    row_above = hd(hd(acc))
+    triple = [row, row_above, row_below]
+    triples([row_below | rows], [triple | acc])
   end
 
 
