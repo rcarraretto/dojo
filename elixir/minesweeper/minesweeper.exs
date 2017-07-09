@@ -1,14 +1,40 @@
 defmodule Minesweeper do
 
   def annotate(board) do
-    board |> triples([]) |> Enum.map(&annotate_row/1)
+    board
+    |> Enum.map(&String.codepoints/1)
+    |> triples([])
+    |> Enum.map(&annotate_row/1)
+    |> Enum.map(&Enum.join/1)
   end
 
   defp annotate_row([row]) do
     neighbors = same_row_neighbors(row)
-    List.zip([row |> String.codepoints, neighbors])
+    base_annotate(row, neighbors)
+  end
+
+  defp annotate_row([row, row_below]) do
+    neighbors1 = same_row_neighbors(row)
+    neighbors2 = adjacent_row_neighbors(row_below)
+    neighbors = all_neighbors([neighbors1, neighbors2])
+    base_annotate(row, neighbors)
+  end
+
+  defp annotate_row([row_above, row, row_below]) do
+    neighbors1 = same_row_neighbors(row)
+    neighbors2 = adjacent_row_neighbors(row_above)
+    neighbors3 = adjacent_row_neighbors(row_below)
+    neighbors = all_neighbors([neighbors1, neighbors2, neighbors3])
+    base_annotate(row, neighbors)
+  end
+
+  defp all_neighbors(list) do
+    list |> List.zip |> Enum.map(&Tuple.to_list/1)
+  end
+
+  defp base_annotate(row, neighbors) do
+    List.zip([row, neighbors])
     |> Enum.map(&annotate_cell/1)
-    |> Enum.join
   end
 
   defp annotate_cell({ "*", _neighbors }) do
@@ -16,7 +42,8 @@ defmodule Minesweeper do
   end
 
   defp annotate_cell({ " ", neighbors }) do
-    Enum.count(neighbors, fn(cell) -> cell == "*" end)
+    count = Enum.count(neighbors, fn(cell) -> cell == "*" end)
+    if count == 0, do: " ", else: count
   end
 
   defp triples([], acc) do
@@ -40,7 +67,7 @@ defmodule Minesweeper do
 
 
   def same_row_neighbors(row) do
-    row |> String.codepoints |> _assemble_row([])
+    row |> _assemble_row([])
     |> Enum.map(fn({ _cell, neighbors }) -> neighbors end)
   end
 
@@ -55,7 +82,7 @@ defmodule Minesweeper do
   end
 
   defp _assemble_row([cell | cells], []) do
-    neighbors = [hd(cells)]
+    neighbors = if Enum.empty?(cells), do: [], else: [hd(cells)]
     t = {cell, neighbors}
     _assemble_row(cells, [t])
   end
@@ -67,7 +94,7 @@ defmodule Minesweeper do
   end
 
   def adjacent_row_neighbors(row) do
-    row |> String.codepoints |> _assemble_adjacent([])
+    row |> _assemble_adjacent([])
   end
 
   defp _assemble_adjacent([], acc) do
@@ -76,7 +103,7 @@ defmodule Minesweeper do
 
   # first cell
   defp _assemble_adjacent([cell | cells], []) do
-    neighbors = [cell, hd(cells)]
+    neighbors = if Enum.empty?(cells), do: [cell], else: [cell, hd(cells)]
     _assemble_adjacent(cells, [neighbors])
   end
 
@@ -96,5 +123,4 @@ defmodule Minesweeper do
     neighbors = [prev_cell, cell, hd(cells)]
     _assemble_adjacent(cells, [neighbors | acc])
   end
-
 end
