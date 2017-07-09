@@ -3,31 +3,36 @@ defmodule Minesweeper do
   @bomb "*"
   @blank " "
 
-  def annotate([]), do: []
   def annotate(board) do
-    size = board |> List.first |> String.length
     board
-    |> to_matrix
-    |> minesweep
-    |> to_board(size)
+    |> to_matrix()
+    |> annotate_matrix()
+    |> to_board()
   end
 
-  def minesweep(board) do
-    for {i, row} <- board, {j, cell} <- row do
-      annotate_cell(cell, board, i, j)
+  def annotate_matrix(matrix) do
+    for {i, row} <- matrix do
+      annotate_row(matrix, i, row)
     end
   end
 
-  defp annotate_cell(@bomb, _board, _i, _j) do
+  defp annotate_row(matrix, i, row) do
+    cells = for {j, cell} <- row do
+      annotate_cell(matrix, i, j, cell)
+    end
+    {i, cells}
+  end
+
+  defp annotate_cell(_matrix, _i, _j, @bomb) do
     @bomb
   end
 
-  defp annotate_cell(@blank, board, i, j) do
-    cell_with_neighbors(board, i, j) |> count_bombs
+  defp annotate_cell(matrix, i, j, @blank) do
+    cell_with_neighbors(matrix, i, j) |> count_bombs()
   end
 
-  defp cell_with_neighbors(board, i, j) do
-    for x <- -1..1, y <- -1..1, do: board[i+x][j+y]
+  defp cell_with_neighbors(matrix, i, j) do
+    for x <- -1..1, y <- -1..1, do: matrix[i+x][j+y]
   end
 
   defp count_bombs(cells) do
@@ -39,14 +44,14 @@ defmodule Minesweeper do
     list
     |> Enum.map(&String.graphemes/1)
     |> Enum.map(&list_to_map/1)
-    |> list_to_map
+    |> list_to_map()
   end
 
   defp list_to_map(list) do
-    list |> Enum.with_index |> Enum.into(%{}, fn {x, i} -> {i, x} end)
+    list |> Enum.with_index() |> Enum.into(%{}, fn {x, i} -> {i, x} end)
   end
 
-  defp to_board(list, size) do
-    list |> Enum.chunk(size) |> Enum.map(&to_string/1)
+  defp to_board(matrix) do
+    matrix |> Enum.map(fn({_i, row}) -> row end) |> Enum.map(&to_string/1)
   end
 end
