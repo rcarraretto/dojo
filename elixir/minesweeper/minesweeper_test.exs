@@ -10,12 +10,14 @@ defmodule MinesweeperTest do
 
   defp clean(b), do: Enum.map(b, &String.replace(&1, ~r/[^*]/, " "))
 
+  @tag :pending
   test "zero size board" do
     b = []
     a = []
     assert Minesweeper.annotate(b) == a
   end
 
+  @tag :pending
   test "empty board" do
     b = ["   ",
          "   ",
@@ -26,6 +28,7 @@ defmodule MinesweeperTest do
     assert Minesweeper.annotate((b)) == a
   end
 
+  @tag :pending
   test "board full of mines" do
     b = ["***",
          "***",
@@ -42,6 +45,7 @@ defmodule MinesweeperTest do
     assert Minesweeper.annotate((b)) == a
   end
 
+  @tag :pending
   test "vertical line" do
     b = [" ",
          "*",

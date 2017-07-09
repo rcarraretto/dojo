@@ -9,60 +9,39 @@ defmodule Minesweeper do
 
   defp annotate_matrix(matrix) do
     matrix
-    |> scan_horizontal
-    |> scan_vertical
     |> scan_diagonal
-  end
-
-  defp scan_horizontal(matrix) do
-    matrix
-    |> Enum.map(&scan_row_horizontal/1)
-  end
-
-  defp scan_vertical(matrix) do
-    matrix
-    |> transpose
-    |> Enum.map(&scan_row_horizontal/1)
-    |> transpose
   end
 
   defp scan_diagonal(matrix) do
     matrix
-    |> pairs([])
-    |> Enum.map(&scan_diagonal_downwards/1)
+    |> triples([])
+    |> Enum.map(&scan_triple/1)
   end
 
-  defp pairs([], acc) do
+  defp triples([], acc) do
     Enum.reverse(acc)
   end
 
-  defp pairs([single_row], acc) do
-    pair = [single_row, nil]
-    pairs([], [pair | acc])
+  defp triples([row], acc) do
+    triple = [row]
+    triples([], [triple | acc])
   end
 
-  defp pairs([row | rows], acc) do
-    pair = [row, hd(rows)]
-    pairs(rows, [pair | acc])
+  defp triples([row1, row2], acc) do
+    triple = [row1, row2]
+    triples([row2], [triple | acc])
   end
 
-  def scan_diagonal_downwards([row, nil]) do
-    row
+  defp triples([row1, row2, row3 | rows], acc) do
+    triple = [row1, row2, row3]
+    triples([row2, row3 | rows], [triple | acc])
   end
 
-  def scan_diagonal_downwards(pair) do
-    # IO.inspect pair
-    _scan_diagonal_downwards(pair, [])
-  end
-
-  # TODO
-  defp _scan_diagonal_downwards([row, _bottom_row], _acc) do
-    row
-  end
-
-  defp scan_row_horizontal(row) do
-    scan_right(row, [])
-    |> scan_left()
+  # given a triple, iterate over the main row cells
+  # for each cell, get it's neighbors
+  def scan_triple([row]) do
+    # IO.inspect row
+    row |> scan_right([])
   end
 
   defp scan_right([], acc) do
@@ -73,20 +52,20 @@ defmodule Minesweeper do
     scan_right([], [x | acc])
   end
 
-  defp scan_right(["*" | tail], acc) do
-    scan_right(tail, ["*" | acc])
+  defp scan_right(["*", 0], acc) do
+    scan_right([], [1, "*" | acc])
   end
 
-  defp scan_right([x, "*" | tail], acc) do
-    scan_right(tail, ["*", x + 1 | acc])
+  defp scan_right(["*", 0, "*" | tail], acc) do
+    scan_right(["*" | tail], [2, "*" | acc])
+  end
+
+  defp scan_right([0, "*" | tail], acc) do
+    scan_right(["*" | tail], [1 | acc])
   end
 
   defp scan_right([x, y | tail], acc) do
     scan_right(tail, [y, x | acc])
-  end
-
-  defp scan_left(row) do
-    row |> Enum.reverse |> scan_right([]) |> Enum.reverse
   end
 
   defp transpose(matrix) do
