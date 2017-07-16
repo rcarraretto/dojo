@@ -52,7 +52,7 @@ defmodule Poker do
 
   defp as_one_pair([pair]) do
     value = group_value(pair)
-    { :one_pair, value }
+    { :one_pair, [value] }
   end
 
   defp as_two_pair(hand_t, pairs) do
@@ -130,29 +130,7 @@ defmodule Poker do
     Tuple.insert_at(category, 0, hand)
   end
 
-  defp compare_categories(
-    {_, :two_pair, [tie, tie2, kicker1]}, {_, :two_pair, [tie, tie2, kicker2]}
-  ) do
-    kicker1 >= kicker2
-  end
-
-  defp compare_categories(
-    {_, :two_pair, [tie, low1, _]}, {_, :two_pair, [tie, low2, _]}
-  ) do
-    low1 >= low2
-  end
-
-  defp compare_categories(
-    {_, :two_pair, [high1, _, _]}, {_, :two_pair, [high2, _, _]}
-  ) do
-    high1 >= high2
-  end
-
-  defp compare_categories({_, :one_pair, value1}, {_, :one_pair, value2}) do
-    value1 >= value2
-  end
-
-  defp compare_categories({_, :high_card, values1}, {_, :high_card, values2}) do
+  defp compare_categories({_, category, values1}, {_, category, values2}) do
     compare_values(values1, values2)
   end
 

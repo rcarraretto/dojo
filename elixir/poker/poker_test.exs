@@ -12,7 +12,7 @@ defmodule PokerTest do
     assert Poker.categorize(~w(4D 5S 6S 8D 3C)) == { :high_card, [8, 6, 5, 4, 3] }
     assert Poker.categorize(~w(2S 4C 7S 9H 10H)) == { :high_card, [10, 9, 7, 4, 2] }
     assert Poker.categorize(~w(4S 5S 7H 8D JC)) == { :high_card, [11, 8, 7, 5, 4] }
-    assert Poker.categorize(~w(2S 4H 6S 4D JH)) == { :one_pair, 4 }
+    assert Poker.categorize(~w(2S 4H 6S 4D JH)) == { :one_pair, [4] }
     assert Poker.categorize(~w(4S 5H 4C 8C 5C)) == { :two_pair, [5, 4, 8] }
     assert Poker.categorize(~w(4S 5H 4C 8S 4H)) == { :three_of_a_kind, [4, 8, 5] }
   end
@@ -101,21 +101,23 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "both hands have three of a kind, tie goes to highest ranked triplet" do
-  #   three_twos = ~w(2S 2H 2C 8D JH)
-  #   three_aces = ~w(4S AH AS 8C AD)
-  #   assert Poker.best_hand([three_twos, three_aces]) == [three_aces]
-  # end
+  test "three of a kind, tie goes to highest ranked triplet" do
+    three_twos = ~w(2S 2H 2C 8D JH)
+    three_aces = ~w(4S AH AS 8C AD)
+    assert Poker.best_hand([three_twos, three_aces]) == [three_aces]
+  end
 
   # @tag :pending
-  # test "with multiple decks, two players can have same three of a kind, ties go to highest remaining cards" do
-  #   three_aces_7_high = ~w(4S AH AS 7C AD)
-  #   three_aces_8_high = ~w(4S AH AS 8C AD)
-  #   assert Poker.best_hand([three_aces_7_high, three_aces_8_high]) == [three_aces_8_high]
+  test "three of a kind, on triplet tie, tie goes to highest remaining cards" do
+    three_aces_7_high = ~w(4S AH AS 7C AD)
+    three_aces_8_high = ~w(4S AH AS 8C AD)
+    assert Poker.best_hand([three_aces_7_high, three_aces_8_high]) ==
+      [three_aces_8_high]
 
-  #   three_aces_8_high_5_low = ~w(5S AH AS 8C AD)
-  #   assert Poker.best_hand([three_aces_8_high_5_low, three_aces_8_high]) == [three_aces_8_high_5_low]
-  # end
+    three_aces_8_high_5_low = ~w(5S AH AS 8C AD)
+    assert Poker.best_hand([three_aces_8_high_5_low, three_aces_8_high]) ==
+      [three_aces_8_high_5_low]
+  end
 
   # @tag :pending
   # test "a straight beats three of a kind" do
