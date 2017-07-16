@@ -29,15 +29,15 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "a tie has multiple winners" do
-  #   high_of_8 = ~w(4D 5S 6S 8D 3C)
-  #   high_of_10 = ~w(2S 4C 7S 9H 10H)
-  #   high_of_jack = ~w(3S 4S 5D 6H JH)
-  #   another_high_of_jack = ~w(3H 4H 5C 6C JD)
+  test "a tie has multiple winners" do
+    high_of_8 = ~w(4D 5S 6S 8D 3C)
+    high_of_10 = ~w(2S 4C 7S 9H 10H)
+    high_of_jack = ~w(3S 4S 5D 6H JH)
+    another_high_of_jack = ~w(3H 4H 5C 6C JD)
 
-  #   hands = [high_of_8, high_of_10, high_of_jack, another_high_of_jack]
-  #   assert Poker.best_hand(hands) == [high_of_jack, another_high_of_jack]
-  # end
+    hands = [high_of_8, high_of_10, high_of_jack, another_high_of_jack]
+    assert Poker.best_hand(hands) == [high_of_jack, another_high_of_jack]
+  end
 
   # @tag :pending
   # test "multiple hands with the same high cards, tie compares next highest ranked, down to last card" do
