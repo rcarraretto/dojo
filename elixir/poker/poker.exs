@@ -82,29 +82,29 @@ defmodule Poker do
     |> Enum.sort(fn({length1, _}, {length2, _}) -> length1 >= length2 end)
   end
 
-  defp categorize_groups(_hand_t, [{4, quad}, {1, [kicker]}]) do
+  defp categorize_groups(_, [{4, quad}, {1, [kicker]}]) do
     quad_value = group_value(quad)
     kicker_value = to_value(kicker)
     { :four_of_a_kind, [quad_value, kicker_value] }
   end
 
-  defp categorize_groups(_hand_t, [{3, triplet}, {2, pair}]) do
+  defp categorize_groups(_, [{3, triplet}, {2, pair}]) do
     triplet_value = group_value(triplet)
     pair_value = group_value(pair)
     { :full_house, [ triplet_value, pair_value ] }
   end
 
-  defp categorize_groups(hand_t, [{3, triplet} | _]) do
+  defp categorize_groups(_, [{3, triplet}, {1, [card1]}, {1, [card2]}]) do
     triplet_value = group_value(triplet)
 
-    remaining_values = hand_t
+    remaining_values = [card1, card2]
     |> Enum.map(&to_value/1)
-    |> Enum.filter(fn(value) -> value != triplet_value end)
+    |> Enum.sort(&(&1 >= &2))
 
     { :three_of_a_kind, [ triplet_value | remaining_values ] }
   end
 
-  defp categorize_groups(_hand_t, [{2, pair1}, {2, pair2}, {1, [kicker]}]) do
+  defp categorize_groups(_, [{2, pair1}, {2, pair2}, {1, [kicker]}]) do
     values = [pair1, pair2]
     |> Enum.map(&group_value/1)
     |> Enum.sort(&(&1 >= &2))
@@ -114,7 +114,7 @@ defmodule Poker do
     { :two_pair, values ++ [kicker] }
   end
 
-  defp categorize_groups(_hand_t, [{2, pair} | _]) do
+  defp categorize_groups(_, [{2, pair} | _]) do
     value = group_value(pair)
     { :one_pair, [value] }
   end
