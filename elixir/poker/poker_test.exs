@@ -3,7 +3,7 @@ if !System.get_env("EXERCISM_TEST_EXAMPLES") do
 end
 
 ExUnit.start
-ExUnit.configure exclude: :pending, trace: true
+ExUnit.configure exclude: :pending, trace: true, capture_log: true
 
 defmodule PokerTest do
   use ExUnit.Case
@@ -14,9 +14,10 @@ defmodule PokerTest do
     assert Poker.categorize(~w(4S 5S 7H 8D JC)) == { :high_card, [11, 8, 7, 5, 4] }
     assert Poker.categorize(~w(2S 4H 6S 4D JH)) == { :one_pair, 4 }
     assert Poker.categorize(~w(4S 5H 4C 8C 5C)) == { :two_pair, [5, 4, 8] }
+    assert Poker.categorize(~w(4S 5H 4C 8S 4H)) == { :three_of_a_kind, [4, 8, 5] }
   end
 
-  #@tag :pending
+  # @tag :pending
   test "single hand always wins" do
     high_of_jack = ~w(4S 5S 7H 8D JC)
     assert Poker.best_hand([high_of_jack]) == [high_of_jack]

@@ -8,29 +8,55 @@ defmodule Poker do
 
   def categorize(hand) do
     hand_t = hand |> init_hand
-    pairs = pairs(hand_t)
-    cond do
-      length(pairs) == 1 -> as_one_pair(pairs)
-      length(pairs) == 2 -> as_two_pair(hand_t, pairs)
-      true -> as_high_card(hand_t)
+    groups = groups(hand_t)
+    highest_length = groups
+    |> Enum.map(fn(group) -> length(group) end)
+    |> Enum.sort(&(&1 >= &2))
+    |> hd
+    case highest_length do
+      1 -> as_high_card(hand_t)
+      2 -> as_pair(hand_t, groups)
+      3 -> as_three_of_a_kind(hand_t, groups)
     end
   end
 
-  defp pairs(hand_t) do
+  defp groups(hand_t) do
     hand_t
     |> Enum.group_by(fn({rank, _suit}) -> rank end)
     |> Map.values
-    |> Enum.filter(fn(group) -> length(group) == 2 end)
+  end
+
+  defp as_three_of_a_kind(hand_t, groups) do
+    triplet = groups |> Enum.find(fn(group) -> length(group) == 3 end)
+    triplet_value = group_value(triplet)
+
+    remaining = hand_t
+    |> Enum.map(&to_value/1)
+    |> Enum.filter(fn(value) -> value != triplet_value end)
+
+    { :three_of_a_kind, [ triplet_value | remaining ] }
+  end
+
+  defp as_pair(hand_t, groups) do
+    pairs = pairs(groups)
+    case length(pairs) do
+      1 -> as_one_pair(pairs)
+      2 -> as_two_pair(hand_t, pairs)
+    end
+  end
+
+  defp pairs(groups) do
+    groups |> Enum.filter(fn(group) -> length(group) == 2 end)
   end
 
   defp as_one_pair([pair]) do
-    value = pair_value(pair)
+    value = group_value(pair)
     { :one_pair, value }
   end
 
   defp as_two_pair(hand_t, pairs) do
     values = pairs
-    |> Enum.map(&pair_value/1)
+    |> Enum.map(&group_value/1)
     |> Enum.sort(&(&1 >= &2))
 
     kicker = hand_t
@@ -42,8 +68,8 @@ defmodule Poker do
     { :two_pair, values ++ [kicker] }
   end
 
-  defp pair_value(pair) do
-    pair |> hd |> elem(0) |> rank_value
+  defp group_value(group) do
+    group |> hd |> elem(0) |> rank_value
   end
 
   defp as_high_card(hand_t) do
