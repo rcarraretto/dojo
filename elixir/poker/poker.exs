@@ -92,13 +92,13 @@ defmodule Poker do
   defp categorize_groups([{4, quad}, {1, [kicker]}]) do
     quad_value = group_value(quad)
     kicker_value = to_value(kicker)
-    { :four_of_a_kind, [quad_value, kicker_value] }
+    {:four_of_a_kind, [quad_value, kicker_value]}
   end
 
   defp categorize_groups([{3, triplet}, {2, pair}]) do
     triplet_value = group_value(triplet)
     pair_value = group_value(pair)
-    { :full_house, [triplet_value, pair_value] }
+    {:full_house, [triplet_value, pair_value]}
   end
 
   defp categorize_groups([{3, triplet}, {1, [high_card]}, {1, [low_card]}]) do
@@ -107,7 +107,7 @@ defmodule Poker do
     remaining_values = [high_card, low_card]
     |> Enum.map(&to_value/1)
 
-    { :three_of_a_kind, [triplet_value | remaining_values] }
+    {:three_of_a_kind, [triplet_value | remaining_values]}
   end
 
   defp categorize_groups([{2, high_pair}, {2, low_pair}, {1, [kicker]}]) do
@@ -116,12 +116,12 @@ defmodule Poker do
 
     kicker = to_value(kicker)
 
-    { :two_pair, values ++ [kicker] }
+    {:two_pair, values ++ [kicker]}
   end
 
   defp categorize_groups([{2, pair} | _]) do
     value = group_value(pair)
-    { :one_pair, [value] }
+    {:one_pair, [value]}
   end
 
   defp categorize_groups(groups) do
@@ -133,9 +133,9 @@ defmodule Poker do
     is_sequence = is_sequence?(sorted_values)
     cond do
       is_same_suit and is_sequence -> as_straight(:straight_flush, sorted_values)
-      is_same_suit -> { :flush, sorted_values |> Enum.reverse }
+      is_same_suit -> {:flush, sorted_values |> Enum.reverse}
       is_sequence -> as_straight(:straight, sorted_values)
-      true -> { :high_card, sorted_values |> Enum.reverse }
+      true -> {:high_card, sorted_values |> Enum.reverse}
     end
   end
 
@@ -167,7 +167,7 @@ defmodule Poker do
       14 -> if List.first(sorted_values) == 2, do: 5, else: 14
       high -> high
     end
-    { category, [high] }
+    {category, [high]}
   end
 
   defp group_value([{rank, _suit} | _cards]), do: rank
