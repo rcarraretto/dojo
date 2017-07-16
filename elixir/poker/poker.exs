@@ -1,6 +1,7 @@
 defmodule Poker do
 
   @category_ranks %{
+    :two_pair => 7,
     :one_pair => 8,
     :high_card => 9,
   }
@@ -8,11 +9,10 @@ defmodule Poker do
   def categorize(hand) do
     hand_t = hand |> init_hand
     pairs = pairs(hand_t)
-    if not Enum.empty?(pairs) do
-      value = pairs |> hd |> hd |> elem(0) |> rank_value
-      { :one_pair, value }
-    else
-      as_high_card(hand_t)
+    cond do
+      length(pairs) == 1 -> as_one_pair(pairs)
+      length(pairs) == 2 -> as_two_pair(pairs)
+      true -> as_high_card(hand_t)
     end
   end
 
@@ -21,6 +21,20 @@ defmodule Poker do
     |> Enum.group_by(fn({rank, _suit}) -> rank end)
     |> Map.values
     |> Enum.filter(fn(group) -> length(group) == 2 end)
+  end
+
+  defp as_one_pair([pair]) do
+    value = pair_value(pair)
+    { :one_pair, value }
+  end
+
+  defp as_two_pair(pairs) do
+    values = pairs |> Enum.map(&pair_value/1) |> Enum.sort(&(&1 >= &2))
+    { :two_pair, values }
+  end
+
+  defp pair_value(pair) do
+    pair |> hd |> elem(0) |> rank_value
   end
 
   defp as_high_card(hand_t) do

@@ -13,6 +13,7 @@ defmodule PokerTest do
     assert Poker.categorize(~w(2S 4C 7S 9H 10H)) == { :high_card, [10, 9, 7, 4, 2] }
     assert Poker.categorize(~w(4S 5S 7H 8D JC)) == { :high_card, [11, 8, 7, 5, 4] }
     assert Poker.categorize(~w(2S 4H 6S 4D JH)) == { :one_pair, 4 }
+    assert Poker.categorize(~w(4S 5H 4C 8C 5C)) == { :two_pair, [5, 4] }
   end
 
   #@tag :pending
@@ -64,11 +65,11 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "two pairs beats one pair" do
-  #   pair_of_8 = ~w(2S 8H 6S 8D JH)
-  #   fives_and_fours = ~w(4S 5H 4C 8C 5C)
-  #   assert Poker.best_hand([pair_of_8, fives_and_fours]) == [fives_and_fours]
-  # end
+  test "two pairs beats one pair" do
+    pair_of_8 = ~w(2S 8H 6S 8D JH)
+    fives_and_fours = ~w(4S 5H 4C 8C 5C)
+    assert Poker.best_hand([pair_of_8, fives_and_fours]) == [fives_and_fours]
+  end
 
   # @tag :pending
   # test "both hands have two pairs, highest ranked pair wins" do
