@@ -19,6 +19,7 @@ defmodule PokerTest do
     assert Poker.categorize(~w(4D AH 3S 2D 5C)) == { :straight, [5] }
     assert Poker.categorize(~w(10D JH QS KD AC)) == { :straight, [14] }
     assert Poker.categorize(~w(2S 4S 5S 6S 7S)) == { :flush, [7, 6, 5, 4, 2] }
+    assert Poker.categorize(~w(4S 5H 4C 5D 4H)) == { :full_house, [4, 5] }
   end
 
   # @tag :pending
@@ -176,25 +177,25 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "full house beats a flush" do
-  #   flush_to_8 = ~w(3H 6H 7H 8H 5H)
-  #   full = ~w(4S 5H 4C 5D 4H)
-  #   assert Poker.best_hand([flush_to_8, full]) == [full]
-  # end
+  test "full house beats a flush" do
+    flush_to_8 = ~w(3H 6H 7H 8H 5H)
+    full = ~w(4S 5H 4C 5D 4H)
+    assert Poker.best_hand([flush_to_8, full]) == [full]
+  end
 
   # @tag :pending
-  # test "both hands have a full house, tie goes to highest-ranked triplet" do
-  #   full_of_4_by_9 = ~w(4H 4S 4D 9S 9D)
-  #   full_of_5_by_8 = ~w(5H 5S 5D 8S 8D)
-  #   assert Poker.best_hand([full_of_4_by_9, full_of_5_by_8]) == [full_of_5_by_8]
-  # end
+  test "full house, on tie, goes to highest-ranked triplet" do
+    full_of_4_by_9 = ~w(4H 4S 4D 9S 9D)
+    full_of_5_by_8 = ~w(5H 5S 5D 8S 8D)
+    assert Poker.best_hand([full_of_4_by_9, full_of_5_by_8]) == [full_of_5_by_8]
+  end
 
   # @tag :pending
-  # test "with multiple decks, both hands have a full house with the same triplet, tie goes to the pair" do
-  #   full_of_5_by_9 = ~w(5H 5S 5D 9S 9D)
-  #   full_of_5_by_8 = ~w(5H 5S 5D 8S 8D)
-  #   assert Poker.best_hand([full_of_5_by_9, full_of_5_by_8]) == [full_of_5_by_9]
-  # end
+  test "full house, same triplet, tie goes to the pair" do
+    full_of_5_by_9 = ~w(5H 5S 5D 9S 9D)
+    full_of_5_by_8 = ~w(5H 5S 5D 8S 8D)
+    assert Poker.best_hand([full_of_5_by_9, full_of_5_by_8]) == [full_of_5_by_9]
+  end
 
   # @tag :pending
   # test "four of a kind beats a full house" do

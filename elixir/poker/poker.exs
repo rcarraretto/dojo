@@ -1,6 +1,7 @@
 defmodule Poker do
 
   @category_ranks %{
+    :full_house => 3,
     :flush => 4,
     :straight => 5,
     :three_of_a_kind => 6,
@@ -19,7 +20,7 @@ defmodule Poker do
     case highest_length do
       1 -> as_single(hand_t)
       2 -> as_pair(hand_t, groups)
-      3 -> as_three_of_a_kind(hand_t, groups)
+      3 -> as_triplet(hand_t, groups)
     end
   end
 
@@ -27,6 +28,14 @@ defmodule Poker do
     hand_t
     |> Enum.group_by(fn({rank, _suit}) -> rank end)
     |> Map.values
+  end
+
+  defp as_triplet(hand_t, groups) do
+    pairs = pairs(groups)
+    case length(pairs) do
+      0 -> as_three_of_a_kind(hand_t, groups)
+      1 -> as_full_house(groups)
+    end
   end
 
   defp as_single(hand_t) do
@@ -67,6 +76,16 @@ defmodule Poker do
       high -> high
     end
     { :straight, [high] }
+  end
+
+  defp as_full_house(groups) do
+    triplet = groups |> Enum.find(fn(group) -> length(group) == 3 end)
+    triplet_value = group_value(triplet)
+
+    pair = groups |> Enum.find(fn(group) -> length(group) == 2 end)
+    pair_value = group_value(pair)
+
+    { :full_house, [ triplet_value, pair_value ] }
   end
 
   defp as_three_of_a_kind(hand_t, groups) do
