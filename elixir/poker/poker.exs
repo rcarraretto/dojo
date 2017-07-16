@@ -1,11 +1,37 @@
 defmodule Poker do
 
+  @category_ranks %{
+    :one_pair => 8,
+    :high_card => 9,
+  }
+
   def categorize(hand) do
-    values = hand
+    hand_t = hand |> init_hand
+    pairs = pairs(hand_t)
+    if not Enum.empty?(pairs) do
+      value = pairs |> hd |> hd |> elem(0) |> rank_value
+      { :one_pair, value }
+    else
+      as_high_card(hand_t)
+    end
+  end
+
+  defp pairs(hand_t) do
+    hand_t
+    |> Enum.group_by(fn({rank, _suit}) -> rank end)
+    |> Map.values
+    |> Enum.filter(fn(group) -> length(group) == 2 end)
+  end
+
+  defp as_high_card(hand_t) do
+    values = hand_t |> Enum.map(&to_value/1)
+    { :high_card, values }
+  end
+
+  defp init_hand(hand) do
+    hand
     |> hand_to_tuples
     |> Enum.sort(&compare_cards/2)
-    |> Enum.map(&to_value/1)
-    { :high_card, values }
   end
 
   defp hand_to_tuples(hand) do
@@ -56,6 +82,10 @@ defmodule Poker do
 
   defp compare_categories({_, :high_card, values1}, {_, :high_card, values2}) do
     compare_values(values1, values2)
+  end
+
+  defp compare_categories({_, category1, _}, {_, category2, _}) do
+    @category_ranks[category1] <= @category_ranks[category2]
   end
 
   defp compare_values([], []) do

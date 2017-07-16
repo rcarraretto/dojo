@@ -12,6 +12,7 @@ defmodule PokerTest do
     assert Poker.categorize(~w(4D 5S 6S 8D 3C)) == { :high_card, [8, 6, 5, 4, 3] }
     assert Poker.categorize(~w(2S 4C 7S 9H 10H)) == { :high_card, [10, 9, 7, 4, 2] }
     assert Poker.categorize(~w(4S 5S 7H 8D JC)) == { :high_card, [11, 8, 7, 5, 4] }
+    assert Poker.categorize(~w(2S 4H 6S 4D JH)) == { :one_pair, 4 }
   end
 
   #@tag :pending
@@ -49,11 +50,11 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "one pair beats high card" do
-  #   high_of_king = ~w(4S 5H 6C 8D KH)
-  #   pair_of_4 = ~w(2S 4H 6S 4D JH)
-  #   assert Poker.best_hand([high_of_king, pair_of_4]) == [pair_of_4]
-  # end
+  test "one pair beats high card" do
+    high_of_king = ~w(4S 5H 6C 8D KH)
+    pair_of_4 = ~w(2S 4H 6S 4D JH)
+    assert Poker.best_hand([high_of_king, pair_of_4]) == [pair_of_4]
+  end
 
   # @tag :pending
   # test "highest pair wins" do
