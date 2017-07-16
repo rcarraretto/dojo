@@ -11,7 +11,7 @@ defmodule Poker do
     pairs = pairs(hand_t)
     cond do
       length(pairs) == 1 -> as_one_pair(pairs)
-      length(pairs) == 2 -> as_two_pair(pairs)
+      length(pairs) == 2 -> as_two_pair(hand_t, pairs)
       true -> as_high_card(hand_t)
     end
   end
@@ -28,9 +28,18 @@ defmodule Poker do
     { :one_pair, value }
   end
 
-  defp as_two_pair(pairs) do
-    values = pairs |> Enum.map(&pair_value/1) |> Enum.sort(&(&1 >= &2))
-    { :two_pair, values }
+  defp as_two_pair(hand_t, pairs) do
+    values = pairs
+    |> Enum.map(&pair_value/1)
+    |> Enum.sort(&(&1 >= &2))
+
+    kicker = hand_t
+    |> Enum.map(&to_value/1)
+    |> Enum.find(fn(value) ->
+      not value in values
+    end)
+
+    { :two_pair, values ++ [kicker] }
   end
 
   defp pair_value(pair) do
@@ -94,11 +103,21 @@ defmodule Poker do
     Tuple.insert_at(category, 0, hand)
   end
 
-  defp compare_categories({_, :two_pair, [tie, low1]}, {_, :two_pair, [tie, low2]}) do
+  defp compare_categories(
+    {_, :two_pair, [tie, tie2, kicker1]}, {_, :two_pair, [tie, tie2, kicker2]}
+  ) do
+    kicker1 >= kicker2
+  end
+
+  defp compare_categories(
+    {_, :two_pair, [tie, low1, _]}, {_, :two_pair, [tie, low2, _]}
+  ) do
     low1 >= low2
   end
 
-  defp compare_categories({_, :two_pair, [high1, _]}, {_, :two_pair, [high2, _]}) do
+  defp compare_categories(
+    {_, :two_pair, [high1, _, _]}, {_, :two_pair, [high2, _, _]}
+  ) do
     high1 >= high2
   end
 

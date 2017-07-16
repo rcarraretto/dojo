@@ -13,7 +13,7 @@ defmodule PokerTest do
     assert Poker.categorize(~w(2S 4C 7S 9H 10H)) == { :high_card, [10, 9, 7, 4, 2] }
     assert Poker.categorize(~w(4S 5S 7H 8D JC)) == { :high_card, [11, 8, 7, 5, 4] }
     assert Poker.categorize(~w(2S 4H 6S 4D JH)) == { :one_pair, 4 }
-    assert Poker.categorize(~w(4S 5H 4C 8C 5C)) == { :two_pair, [5, 4] }
+    assert Poker.categorize(~w(4S 5H 4C 8C 5C)) == { :two_pair, [5, 4, 8] }
   end
 
   #@tag :pending
@@ -85,11 +85,12 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "both hands have two identically ranked pairs, tie goes to remaining card (kicker)" do
-  #   queens_jacks_and_8 = ~w(JD QH JS 8D QC)
-  #   queens_jacks_and_2 = ~w(JS QS JC 2D QD)
-  #   assert Poker.best_hand([queens_jacks_and_8, queens_jacks_and_2]) == [queens_jacks_and_8]
-  # end
+  test "two pairs, identical pairs, tie goes to remaining card (kicker)" do
+    queens_jacks_and_8 = ~w(JD QH JS 8D QC)
+    queens_jacks_and_2 = ~w(JS QS JC 2D QD)
+    assert Poker.best_hand([queens_jacks_and_8, queens_jacks_and_2]) ==
+      [queens_jacks_and_8]
+  end
 
   # @tag :pending
   # test "three of a kind beats two pair" do
