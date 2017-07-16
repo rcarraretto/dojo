@@ -64,8 +64,15 @@ defmodule Poker do
   end
 
   defp card_to_tuple(card) do
-    Regex.run(~r/(.*)([CDHS])/, card, capture: :all_but_first) |> List.to_tuple
+    [rank, suit] = Regex.run(~r/(.*)([CDHS])/, card, capture: :all_but_first)
+    {rank_value(rank), suit}
   end
+
+  defp rank_value("J"), do: 11
+  defp rank_value("Q"), do: 12
+  defp rank_value("K"), do: 13
+  defp rank_value("A"), do: 14
+  defp rank_value(rank), do: String.to_integer(rank)
 
   defp groups(hand_t) do
     hand_t
@@ -163,17 +170,6 @@ defmodule Poker do
     { category, [high] }
   end
 
-  defp group_value([{rank, _suit} | _cards]) do
-    rank_value(rank)
-  end
-
-  defp rank_value("J"), do: 11
-  defp rank_value("Q"), do: 12
-  defp rank_value("K"), do: 13
-  defp rank_value("A"), do: 14
-  defp rank_value(rank), do: String.to_integer(rank)
-
-  defp to_value({rank, _}) do
-    rank_value(rank)
-  end
+  defp group_value([{rank, _suit} | _cards]), do: rank
+  defp to_value({rank, _}), do: rank
 end
