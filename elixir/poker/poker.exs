@@ -82,53 +82,38 @@ defmodule Poker do
   end
 
   defp compare_groups({length, cards1}, {length, cards2}) do
-    group_value(cards1) >= group_value(cards2)
+    value(cards1) >= value(cards2)
   end
 
   defp compare_groups({length1, _}, {length2, _}) do
     length1 >= length2
   end
 
-  defp categorize_groups([{4, quad}, {1, [kicker]}]) do
-    quad_value = group_value(quad)
-    kicker_value = to_value(kicker)
-    {:four_of_a_kind, [quad_value, kicker_value]}
+  defp categorize_groups([{4, quad}, {1, kicker}]) do
+    {:four_of_a_kind, values([quad, kicker])}
   end
 
   defp categorize_groups([{3, triplet}, {2, pair}]) do
-    triplet_value = group_value(triplet)
-    pair_value = group_value(pair)
-    {:full_house, [triplet_value, pair_value]}
+    {:full_house, values([triplet, pair])}
   end
 
-  defp categorize_groups([{3, triplet}, {1, [high_card]}, {1, [low_card]}]) do
-    triplet_value = group_value(triplet)
-
-    remaining_values = [high_card, low_card]
-    |> Enum.map(&to_value/1)
-
-    {:three_of_a_kind, [triplet_value | remaining_values]}
+  defp categorize_groups([{3, triplet}, {1, high_card}, {1, low_card}]) do
+    {:three_of_a_kind, values([triplet, high_card, low_card])}
   end
 
   defp categorize_groups([{2, high_pair}, {2, low_pair}, {1, [kicker]}]) do
-    values = [high_pair, low_pair]
-    |> Enum.map(&group_value/1)
-
-    kicker = to_value(kicker)
-
-    {:two_pair, values ++ [kicker]}
+    {:two_pair, values([high_pair, low_pair, kicker])}
   end
 
   defp categorize_groups([{2, pair} | _]) do
-    value = group_value(pair)
-    {:one_pair, [value]}
+    {:one_pair, values([pair])}
   end
 
   defp categorize_groups(groups) do
     sorted_hand = groups
     |> Enum.map(fn({_, cards}) -> cards end)
     |> List.flatten
-    sorted_values = sorted_hand |> Enum.map(&to_value/1) |> Enum.reverse
+    sorted_values = sorted_hand |> Enum.map(&value/1) |> Enum.reverse
     is_same_suit = same_suit?(sorted_hand)
     is_sequence = is_sequence?(sorted_values)
     cond do
@@ -170,6 +155,7 @@ defmodule Poker do
     {category, [high]}
   end
 
-  defp group_value([{rank, _suit} | _cards]), do: rank
-  defp to_value({rank, _}), do: rank
+  defp values(list), do: list |> Enum.map(&value/1)
+  defp value([{rank, _suit} | _cards]), do: rank
+  defp value({rank, _}), do: rank
 end
