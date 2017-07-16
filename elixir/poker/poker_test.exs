@@ -18,6 +18,7 @@ defmodule PokerTest do
     assert Poker.categorize(~w(3S 4D 2S 6D 5C)) == { :straight, [6] }
     assert Poker.categorize(~w(4D AH 3S 2D 5C)) == { :straight, [5] }
     assert Poker.categorize(~w(10D JH QS KD AC)) == { :straight, [14] }
+    assert Poker.categorize(~w(2S 4S 5S 6S 7S)) == { :flush, [7, 6, 5, 4, 2] }
   end
 
   # @tag :pending
@@ -158,21 +159,21 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "flush beats a straight" do
-  #   straight_to_8 = ~w(4C 6H 7D 8D 5H)
-  #   flush_to_7 = ~w(2S 4S 5S 6S 7S)
-  #   assert Poker.best_hand([straight_to_8, flush_to_7]) == [flush_to_7]
-  # end
+  test "flush beats a straight" do
+    straight_to_8 = ~w(4C 6H 7D 8D 5H)
+    flush_to_7 = ~w(2S 4S 5S 6S 7S)
+    assert Poker.best_hand([straight_to_8, flush_to_7]) == [flush_to_7]
+  end
 
   # @tag :pending
-  # test "both hands have a flush, tie goes to high card, down to the last one if necessary" do
-  #   flush_to_9 = ~w(4H 7H 8H 9H 6H)
-  #   flush_to_7 = ~w(2S 4S 5S 6S 7S)
-  #   assert Poker.best_hand([flush_to_9, flush_to_7]) == [flush_to_9]
+  test "flush, on tie, goes to high card, down to the last one if necessary" do
+    flush_to_9 = ~w(4H 7H 8H 9H 6H)
+    flush_to_7 = ~w(2S 4S 5S 6S 7S)
+    assert Poker.best_hand([flush_to_9, flush_to_7]) == [flush_to_9]
 
-  #   flush_to_9_with_4_matches = ~w(3S 6S 7S 8S 9S)
-  #   assert Poker.best_hand([flush_to_9, flush_to_9_with_4_matches]) == [flush_to_9]
-  # end
+    flush_to_9_with_4_matches = ~w(3S 6S 7S 8S 9S)
+    assert Poker.best_hand([flush_to_9, flush_to_9_with_4_matches]) == [flush_to_9]
+  end
 
   # @tag :pending
   # test "full house beats a flush" do
