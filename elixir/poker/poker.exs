@@ -1,6 +1,7 @@
 defmodule Poker do
 
   @category_ranks %{
+    :straight => 5,
     :three_of_a_kind => 6,
     :two_pair => 7,
     :one_pair => 8,
@@ -15,7 +16,7 @@ defmodule Poker do
     |> Enum.sort(&(&1 >= &2))
     |> hd
     case highest_length do
-      1 -> as_high_card(hand_t)
+      1 -> as_single(hand_t)
       2 -> as_pair(hand_t, groups)
       3 -> as_three_of_a_kind(hand_t, groups)
     end
@@ -25,6 +26,15 @@ defmodule Poker do
     hand_t
     |> Enum.group_by(fn({rank, _suit}) -> rank end)
     |> Map.values
+  end
+
+  defp as_single(hand_t) do
+    sorted_values = hand_t |> Enum.map(&to_value/1) |> Enum.sort
+    sequence = Enum.at(sorted_values, 0)..Enum.at(sorted_values, 4) |> Enum.to_list
+    case sorted_values == sequence do
+      true -> { :straight, [] }
+      false -> as_high_card(hand_t)
+    end
   end
 
   defp as_three_of_a_kind(hand_t, groups) do

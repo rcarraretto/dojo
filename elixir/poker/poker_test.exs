@@ -15,6 +15,7 @@ defmodule PokerTest do
     assert Poker.categorize(~w(2S 4H 6S 4D JH)) == { :one_pair, [4] }
     assert Poker.categorize(~w(4S 5H 4C 8C 5C)) == { :two_pair, [5, 4, 8] }
     assert Poker.categorize(~w(4S 5H 4C 8S 4H)) == { :three_of_a_kind, [4, 8, 5] }
+    assert Poker.categorize(~w(3S 4D 2S 6D 5C)) == { :straight, [] }
   end
 
   # @tag :pending
@@ -120,11 +121,11 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "a straight beats three of a kind" do
-  #   three_fours = ~w(4S 5H 4C 8D 4H)
-  #   straight = ~w(3S 4D 2S 6D 5C)
-  #   assert Poker.best_hand([three_fours, straight]) == [straight]
-  # end
+  test "a straight beats three of a kind" do
+    three_fours = ~w(4S 5H 4C 8D 4H)
+    straight = ~w(3S 4D 2S 6D 5C)
+    assert Poker.best_hand([three_fours, straight]) == [straight]
+  end
 
   # @tag :pending
   # test "aces can be end a straight (10 J Q K A)" do
