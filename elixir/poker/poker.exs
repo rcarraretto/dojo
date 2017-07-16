@@ -20,7 +20,7 @@ defmodule Poker do
     hands
     |> Enum.map(&with_category/1)
     |> Enum.sort(&compare_categories/2)
-    |> filter_bests
+    |> filter_bests()
     |> Enum.map(&(elem(&1, 0)))
   end
 
@@ -63,7 +63,7 @@ defmodule Poker do
 
   defp init_hand(hand) do
     hand
-    |> hand_to_tuples
+    |> hand_to_tuples()
     |> Enum.sort(&compare_cards/2)
   end
 
@@ -91,7 +91,7 @@ defmodule Poker do
   defp categorize_groups(_, [{3, triplet}, {2, pair}]) do
     triplet_value = group_value(triplet)
     pair_value = group_value(pair)
-    { :full_house, [ triplet_value, pair_value ] }
+    { :full_house, [triplet_value, pair_value] }
   end
 
   defp categorize_groups(_, [{3, triplet}, {1, [card1]}, {1, [card2]}]) do
@@ -101,7 +101,7 @@ defmodule Poker do
     |> Enum.map(&to_value/1)
     |> Enum.sort(&(&1 >= &2))
 
-    { :three_of_a_kind, [ triplet_value | remaining_values ] }
+    { :three_of_a_kind, [triplet_value | remaining_values] }
   end
 
   defp categorize_groups(_, [{2, pair1}, {2, pair2}, {1, [kicker]}]) do
@@ -163,7 +163,7 @@ defmodule Poker do
   end
 
   defp group_value(group) do
-    group |> hd |> elem(0) |> rank_value
+    group |> hd() |> elem(0) |> rank_value
   end
 
   defp compare_cards({rank1, _}, {rank2, _}) do
