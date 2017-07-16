@@ -74,8 +74,8 @@ defmodule Poker do
   defp rank_value("A"), do: 14
   defp rank_value(rank), do: String.to_integer(rank)
 
-  defp groups(hand_t) do
-    hand_t
+  defp groups(cards) do
+    cards
     |> Enum.group_by(fn({rank, _suit}) -> rank end)
     |> Enum.map(fn({_, cards}) -> {length(cards), cards} end)
     |> Enum.sort(&compare_groups/2)
@@ -110,11 +110,11 @@ defmodule Poker do
   end
 
   defp categorize_groups(groups) do
-    sorted_hand = groups
+    sorted_cards = groups
     |> Enum.map(fn({_, cards}) -> cards end)
     |> List.flatten
-    sorted_values = sorted_hand |> Enum.map(&value/1) |> Enum.reverse
-    is_same_suit = same_suit?(sorted_hand)
+    sorted_values = sorted_cards |> Enum.map(&value/1) |> Enum.reverse
+    is_same_suit = same_suit?(sorted_cards)
     is_sequence = is_sequence?(sorted_values)
     cond do
       is_same_suit and is_sequence -> as_straight(:straight_flush, sorted_values)
@@ -124,10 +124,9 @@ defmodule Poker do
     end
   end
 
-  defp same_suit?(hand_t) do
-    hand_t
-    |> Enum.group_by(fn({_, suit}) -> suit end)
-    |> Map.keys()
+  defp same_suit?(cards) do
+    cards
+    |> Enum.uniq_by(fn({_, suit}) -> suit end)
     |> length() == 1
   end
 
