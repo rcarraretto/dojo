@@ -1,6 +1,7 @@
 defmodule Poker do
 
   @category_ranks %{
+    :straight_flush => 1,
     :four_of_a_kind => 2,
     :full_house => 3,
     :flush => 4,
@@ -53,9 +54,12 @@ defmodule Poker do
 
   defp as_single(hand_t) do
     sorted_values = hand_t |> Enum.map(&to_value/1) |> Enum.sort
+    is_same_suit = same_suit?(hand_t)
+    is_sequence = is_sequence?(sorted_values)
     cond do
-      same_suit?(hand_t) -> { :flush, sorted_values |> Enum.reverse }
-      is_sequence?(sorted_values) -> as_straight(sorted_values)
+      is_same_suit and is_sequence -> { :straight_flush, sorted_values |> Enum.reverse }
+      is_same_suit -> { :flush, sorted_values |> Enum.reverse }
+      is_sequence -> as_straight(sorted_values)
       true -> as_high_card(hand_t)
     end
   end
@@ -184,12 +188,6 @@ defmodule Poker do
     [hand]
   end
 
-  @doc """
-  Aces can be used in low (A 2 3 4 5) or high (10 J Q K A) straights, but do
-  not count as a high card in the former case.
-
-  For example, (A 2 3 4 5) will lose to (2 3 4 5 6).
-  """
   @spec best_hand(list(list(String.t()))) :: list(list(String.t()))
   def best_hand(hands) do
     hands
