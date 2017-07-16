@@ -9,9 +9,9 @@ defmodule PokerTest do
   use ExUnit.Case
 
   test "categorize" do
-    assert Poker.categorize(~w(4D 5S 6S 8D 3C)) == { :high_card, "8" }
-    assert Poker.categorize(~w(2S 4C 7S 9H 10H)) == { :high_card, "10" }
-    assert Poker.categorize(~w(4S 5S 7H 8D JC)) == { :high_card, "J" }
+    assert Poker.categorize(~w(4D 5S 6S 8D 3C)) == { :high_card, [8, 6, 5, 4, 3] }
+    assert Poker.categorize(~w(2S 4C 7S 9H 10H)) == { :high_card, [10, 9, 7, 4, 2] }
+    assert Poker.categorize(~w(4S 5S 7H 8D JC)) == { :high_card, [11, 8, 7, 5, 4] }
   end
 
   #@tag :pending
@@ -40,11 +40,13 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "multiple hands with the same high cards, tie compares next highest ranked, down to last card" do
-  #   high_of_8_low_of_3 = ~w(3S 5H 6S 8D 7H)
-  #   high_of_8_low_of_2 = ~w(2S 5D 6D 8C 7S)
-  #   assert Poker.best_hand([high_of_8_low_of_3, high_of_8_low_of_2]) == [high_of_8_low_of_3]
-  # end
+  test "multiple hands with the same high cards" do
+    # tie compares next highest ranked, down to last card
+    high_of_8_low_of_3 = ~w(3S 5H 6S 8D 7H)
+    high_of_8_low_of_2 = ~w(2S 5D 6D 8C 7S)
+    assert Poker.best_hand([high_of_8_low_of_3, high_of_8_low_of_2]) ==
+      [high_of_8_low_of_3]
+  end
 
   # @tag :pending
   # test "one pair beats high card" do

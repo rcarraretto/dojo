@@ -1,12 +1,11 @@
 defmodule Poker do
 
   def categorize(hand) do
-    high = hand
+    values = hand
     |> hand_to_tuples
     |> Enum.sort(&compare_cards/2)
-    |> List.last
-    |> elem(0)
-    { :high_card, high }
+    |> Enum.map(&to_value/1)
+    { :high_card, values }
   end
 
   defp hand_to_tuples(hand) do
@@ -18,7 +17,7 @@ defmodule Poker do
   end
 
   defp compare_cards({rank1, _}, {rank2, _}) do
-    rank_value(rank1) < rank_value(rank2)
+    rank_value(rank1) >= rank_value(rank2)
   end
 
   defp rank_value("J"), do: 11
@@ -26,6 +25,10 @@ defmodule Poker do
   defp rank_value("K"), do: 13
   defp rank_value("A"), do: 14
   defp rank_value(rank), do: String.to_integer(rank)
+
+  defp to_value({rank, _}) do
+    rank_value(rank)
+  end
 
   def best_hand([hand]) do
     [hand]
@@ -51,13 +54,25 @@ defmodule Poker do
     Tuple.insert_at(category, 0, hand)
   end
 
-  defp compare_categories({_, _, high_card}, {_, _, high_card2}) do
-    rank_value(high_card) >= rank_value(high_card2)
+  defp compare_categories({_, :high_card, values1}, {_, :high_card, values2}) do
+    compare_values(values1, values2)
+  end
+
+  defp compare_values([], []) do
+    true
+  end
+
+  defp compare_values([value | values1], [value | values2]) do
+    compare_values(values1, values2)
+  end
+
+  defp compare_values([value1 | _], [value2 | _]) do
+    value1 >= value2
   end
 
   defp filter_bests(categories) do
-    {_, _, best_high_card } = hd(categories)
+    best = hd(categories)
     categories
-    |> Enum.filter(fn({_, _, high_card}) -> high_card == best_high_card end)
+    |> Enum.take_while(fn(category) -> compare_categories(category, best) end)
   end
 end
