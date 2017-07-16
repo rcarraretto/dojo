@@ -42,8 +42,7 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  test "multiple hands with the same high cards" do
-    # tie compares next highest ranked, down to last card
+  test "high card, on tie on highest card, goes down to next highest ranked card" do
     high_of_8_low_of_3 = ~w(3S 5H 6S 8D 7H)
     high_of_8_low_of_2 = ~w(2S 5D 6D 8C 7S)
     assert Poker.best_hand([high_of_8_low_of_3, high_of_8_low_of_2]) ==
@@ -72,18 +71,18 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  test "both hands have two pairs, highest ranked pair wins" do
+  test "two pairs, on tie, goes to high pair" do
     eights_and_twos = ~w(2S 8H 2D 8D 3H)
     fives_and_fours = ~w(4S 5H 4C 8S 5D)
     assert Poker.best_hand([eights_and_twos, fives_and_fours]) == [eights_and_twos]
   end
 
   # @tag :pending
-  # test "both hands have two pairs, with the same highest ranked pair, tie goes to low pair" do
-  #   queens_and_twos = ~w(2S QS 2C QD JH)
-  #   queens_and_jacks = ~w(JD QH JS 8D QC)
-  #   assert Poker.best_hand([queens_and_twos, queens_and_jacks]) == [queens_and_jacks]
-  # end
+  test "two pairs, tie on high pair, goes to low pair" do
+    queens_and_twos = ~w(2S QS 2C QD JH)
+    queens_and_jacks = ~w(JD QH JS 8D QC)
+    assert Poker.best_hand([queens_and_twos, queens_and_jacks]) == [queens_and_jacks]
+  end
 
   # @tag :pending
   # test "both hands have two identically ranked pairs, tie goes to remaining card (kicker)" do
