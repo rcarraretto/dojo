@@ -56,15 +56,7 @@ defmodule Poker do
   end
 
   def categorize(hand) do
-    hand_t = init_hand(hand)
-    groups = groups(hand_t)
-    categorize_groups(hand_t, groups)
-  end
-
-  defp init_hand(hand) do
-    hand
-    |> hand_to_tuples()
-    |> Enum.sort(&compare_cards/2)
+    hand |> hand_to_tuples |> groups |> categorize_groups
   end
 
   defp hand_to_tuples(hand) do
@@ -79,49 +71,58 @@ defmodule Poker do
     hand_t
     |> Enum.group_by(fn({rank, _suit}) -> rank end)
     |> Enum.map(fn({_, cards}) -> {length(cards), cards} end)
-    |> Enum.sort(fn({length1, _}, {length2, _}) -> length1 >= length2 end)
+    |> Enum.sort(&compare_groups/2)
   end
 
-  defp categorize_groups(_, [{4, quad}, {1, [kicker]}]) do
+  defp compare_groups({length, cards1}, {length, cards2}) do
+    group_value(cards1) >= group_value(cards2)
+  end
+
+  defp compare_groups({length1, _}, {length2, _}) do
+    length1 >= length2
+  end
+
+  defp categorize_groups([{4, quad}, {1, [kicker]}]) do
     quad_value = group_value(quad)
     kicker_value = to_value(kicker)
     { :four_of_a_kind, [quad_value, kicker_value] }
   end
 
-  defp categorize_groups(_, [{3, triplet}, {2, pair}]) do
+  defp categorize_groups([{3, triplet}, {2, pair}]) do
     triplet_value = group_value(triplet)
     pair_value = group_value(pair)
     { :full_house, [triplet_value, pair_value] }
   end
 
-  defp categorize_groups(_, [{3, triplet}, {1, [card1]}, {1, [card2]}]) do
+  defp categorize_groups([{3, triplet}, {1, [high_card]}, {1, [low_card]}]) do
     triplet_value = group_value(triplet)
 
-    remaining_values = [card1, card2]
+    remaining_values = [high_card, low_card]
     |> Enum.map(&to_value/1)
-    |> Enum.sort(&(&1 >= &2))
 
     { :three_of_a_kind, [triplet_value | remaining_values] }
   end
 
-  defp categorize_groups(_, [{2, pair1}, {2, pair2}, {1, [kicker]}]) do
-    values = [pair1, pair2]
+  defp categorize_groups([{2, high_pair}, {2, low_pair}, {1, [kicker]}]) do
+    values = [high_pair, low_pair]
     |> Enum.map(&group_value/1)
-    |> Enum.sort(&(&1 >= &2))
 
     kicker = to_value(kicker)
 
     { :two_pair, values ++ [kicker] }
   end
 
-  defp categorize_groups(_, [{2, pair} | _]) do
+  defp categorize_groups([{2, pair} | _]) do
     value = group_value(pair)
     { :one_pair, [value] }
   end
 
-  defp categorize_groups(hand_t, _) do
-    sorted_values = hand_t |> Enum.map(&to_value/1) |> Enum.sort
-    is_same_suit = same_suit?(hand_t)
+  defp categorize_groups(groups) do
+    sorted_hand = groups
+    |> Enum.map(fn({_, cards}) -> cards end)
+    |> List.flatten
+    sorted_values = sorted_hand |> Enum.map(&to_value/1) |> Enum.reverse
+    is_same_suit = same_suit?(sorted_hand)
     is_sequence = is_sequence?(sorted_values)
     cond do
       is_same_suit and is_sequence -> as_straight(:straight_flush, sorted_values)
@@ -162,12 +163,8 @@ defmodule Poker do
     { category, [high] }
   end
 
-  defp group_value(group) do
-    group |> hd() |> elem(0) |> rank_value
-  end
-
-  defp compare_cards({rank1, _}, {rank2, _}) do
-    rank_value(rank1) >= rank_value(rank2)
+  defp group_value([{rank, _suit} | _cards]) do
+    rank_value(rank)
   end
 
   defp rank_value("J"), do: 11
