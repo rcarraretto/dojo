@@ -94,12 +94,16 @@ defmodule Poker do
     Tuple.insert_at(category, 0, hand)
   end
 
-  defp compare_categories({_, :high_card, values1}, {_, :high_card, values2}) do
-    compare_values(values1, values2)
+  defp compare_categories({_, :two_pair, [high1, _]}, {_, :two_pair, [high2, _]}) do
+    high1 >= high2
   end
 
   defp compare_categories({_, :one_pair, value1}, {_, :one_pair, value2}) do
     value1 >= value2
+  end
+
+  defp compare_categories({_, :high_card, values1}, {_, :high_card, values2}) do
+    compare_values(values1, values2)
   end
 
   defp compare_categories({_, category1, _}, {_, category2, _}) do

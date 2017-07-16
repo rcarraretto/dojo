@@ -72,11 +72,11 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "both hands have two pairs, highest ranked pair wins" do
-  #   eights_and_twos = ~w(2S 8H 2D 8D 3H)
-  #   fives_and_fours = ~w(4S 5H 4C 8S 5D)
-  #   assert Poker.best_hand([eights_and_twos, fives_and_fours]) == [eights_and_twos]
-  # end
+  test "both hands have two pairs, highest ranked pair wins" do
+    eights_and_twos = ~w(2S 8H 2D 8D 3H)
+    fives_and_fours = ~w(4S 5H 4C 8S 5D)
+    assert Poker.best_hand([eights_and_twos, fives_and_fours]) == [eights_and_twos]
+  end
 
   # @tag :pending
   # test "both hands have two pairs, with the same highest ranked pair, tie goes to low pair" do
