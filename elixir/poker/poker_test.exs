@@ -94,11 +94,11 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "three of a kind beats two pair" do
-  #   eights_and_twos = ~w(2S 8H 2H 8D JH)
-  #   three_fours = ~w(4S 5H 4C 8S 4H)
-  #   assert Poker.best_hand([eights_and_twos, three_fours]) == [three_fours]
-  # end
+  test "three of a kind beats two pair" do
+    eights_and_twos = ~w(2S 8H 2H 8D JH)
+    three_fours = ~w(4S 5H 4C 8S 4H)
+    assert Poker.best_hand([eights_and_twos, three_fours]) == [three_fours]
+  end
 
   # @tag :pending
   # test "both hands have three of a kind, tie goes to highest ranked triplet" do

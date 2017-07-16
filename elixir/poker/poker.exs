@@ -1,6 +1,7 @@
 defmodule Poker do
 
   @category_ranks %{
+    :three_of_a_kind => 6,
     :two_pair => 7,
     :one_pair => 8,
     :high_card => 9,
