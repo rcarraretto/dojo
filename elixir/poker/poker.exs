@@ -57,9 +57,9 @@ defmodule Poker do
     is_same_suit = same_suit?(hand_t)
     is_sequence = is_sequence?(sorted_values)
     cond do
-      is_same_suit and is_sequence -> { :straight_flush, sorted_values |> Enum.reverse }
+      is_same_suit and is_sequence -> as_straight(:straight_flush, sorted_values)
       is_same_suit -> { :flush, sorted_values |> Enum.reverse }
-      is_sequence -> as_straight(sorted_values)
+      is_sequence -> as_straight(:straight, sorted_values)
       true -> as_high_card(hand_t)
     end
   end
@@ -87,12 +87,12 @@ defmodule Poker do
     [sequence]
   end
 
-  def as_straight(sorted_values) do
+  def as_straight(category, sorted_values) do
     high = case List.last(sorted_values) do
       14 -> if List.first(sorted_values) == 2, do: 5, else: 14
       high -> high
     end
-    { :straight, [high] }
+    { category, [high] }
   end
 
   defp as_full_house(groups) do

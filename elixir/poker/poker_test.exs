@@ -22,7 +22,9 @@ defmodule PokerTest do
     assert Poker.categorize(~w(4S 5H 4C 5D 4H)) == { :full_house, [4, 5] }
     assert Poker.categorize(~w(3S 3H 2S 3D 3C)) == { :four_of_a_kind, [3, 2] }
     assert Poker.categorize(~w(7S 8S 9S 6S 10S)) ==
-      { :straight_flush, [10, 9, 8, 7, 6] }
+      { :straight_flush, [10] }
+    assert Poker.categorize(~w(4D AD 3D 2D 5D)) == { :straight_flush, [5] }
+    assert Poker.categorize(~w(10H JH QH KH AH)) == { :straight_flush, [14] }
   end
 
   # @tag :pending
@@ -232,6 +234,14 @@ defmodule PokerTest do
   test "straight flush, tie goes to highest-ranked card" do
     straight_flush_to_8 = ~w(4H 6H 7H 8H 5H)
     straight_flush_to_9 = ~w(5S 7S 8S 9S 6S)
-    assert Poker.best_hand([straight_flush_to_8, straight_flush_to_9]) == [straight_flush_to_9]
+    assert Poker.best_hand([straight_flush_to_8, straight_flush_to_9]) ==
+      [straight_flush_to_9]
+  end
+
+  # # @tag :pending
+  test "a 5-high straight flush is the lowest-scoring straight flush" do
+    straight_to_6 = ~w(2H 3H 4H 5H 6H)
+    straight_to_5 = ~w(4H AH 3H 2H 5H)
+    assert Poker.best_hand([straight_to_6, straight_to_5]) == [straight_to_6]
   end
 end
