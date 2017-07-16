@@ -84,6 +84,10 @@ defmodule Poker do
     compare_values(values1, values2)
   end
 
+  defp compare_categories({_, :one_pair, value1}, {_, :one_pair, value2}) do
+    value1 >= value2
+  end
+
   defp compare_categories({_, category1, _}, {_, category2, _}) do
     @category_ranks[category1] <= @category_ranks[category2]
   end
