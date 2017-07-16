@@ -15,8 +15,9 @@ defmodule PokerTest do
     assert Poker.categorize(~w(2S 4H 6S 4D JH)) == { :one_pair, [4] }
     assert Poker.categorize(~w(4S 5H 4C 8C 5C)) == { :two_pair, [5, 4, 8] }
     assert Poker.categorize(~w(4S 5H 4C 8S 4H)) == { :three_of_a_kind, [4, 8, 5] }
-    assert Poker.categorize(~w(3S 4D 2S 6D 5C)) == { :straight, [] }
-    assert Poker.categorize(~w(4D AH 3S 2D 5C)) == { :straight, [] }
+    assert Poker.categorize(~w(3S 4D 2S 6D 5C)) == { :straight, [6] }
+    assert Poker.categorize(~w(4D AH 3S 2D 5C)) == { :straight, [5] }
+    assert Poker.categorize(~w(10D JH QS KD AC)) == { :straight, [14] }
   end
 
   # @tag :pending
@@ -143,18 +144,18 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "both hands with a straight, tie goes to highest ranked card" do
-  #   straight_to_8 = ~w(4S 6C 7S 8D 5H)
-  #   straight_to_9 = ~w(5S 7H 8S 9D 6H)
-  #   assert Poker.best_hand([straight_to_8, straight_to_9]) == [straight_to_9]
-  # end
+  test "straight, on tie, goes to highest ranked card" do
+    straight_to_8 = ~w(4S 6C 7S 8D 5H)
+    straight_to_9 = ~w(5S 7H 8S 9D 6H)
+    assert Poker.best_hand([straight_to_8, straight_to_9]) == [straight_to_9]
+  end
 
   # @tag :pending
-  # test "even though an ace is usually high, a 5-high straight is the lowest-scoring straight" do
-  #   straight_to_6 = ~w(2H 3C 4D 5D 6H)
-  #   straight_to_5 = ~w(4S AH 3S 2D 5H)
-  #   assert Poker.best_hand([straight_to_6, straight_to_5]) == [straight_to_6]
-  # end
+  test "a 5-high straight is the lowest-scoring straight" do
+    straight_to_6 = ~w(2H 3C 4D 5D 6H)
+    straight_to_5 = ~w(4S AH 3S 2D 5H)
+    assert Poker.best_hand([straight_to_6, straight_to_5]) == [straight_to_6]
+  end
 
   # @tag :pending
   # test "flush beats a straight" do

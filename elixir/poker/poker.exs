@@ -31,7 +31,7 @@ defmodule Poker do
   defp as_single(hand_t) do
     sorted_values = hand_t |> Enum.map(&to_value/1) |> Enum.sort
     case is_sequence?(sorted_values) do
-      true -> { :straight, [] }
+      true -> as_straight(sorted_values)
       false -> as_high_card(hand_t)
     end
   end
@@ -50,6 +50,14 @@ defmodule Poker do
   defp sequences(sorted_values) do
     sequence = Enum.at(sorted_values, 0)..Enum.at(sorted_values, 4) |> Enum.to_list
     [sequence]
+  end
+
+  def as_straight(sorted_values) do
+    high = case List.last(sorted_values) do
+      14 -> if List.first(sorted_values) == 2, do: 5, else: 14
+      high -> high
+    end
+    { :straight, [high] }
   end
 
   defp as_three_of_a_kind(hand_t, groups) do
