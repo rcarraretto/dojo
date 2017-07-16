@@ -20,6 +20,7 @@ defmodule PokerTest do
     assert Poker.categorize(~w(10D JH QS KD AC)) == { :straight, [14] }
     assert Poker.categorize(~w(2S 4S 5S 6S 7S)) == { :flush, [7, 6, 5, 4, 2] }
     assert Poker.categorize(~w(4S 5H 4C 5D 4H)) == { :full_house, [4, 5] }
+    assert Poker.categorize(~w(3S 3H 2S 3D 3C)) == { :four_of_a_kind, [3, 2] }
   end
 
   # @tag :pending
@@ -198,25 +199,25 @@ defmodule PokerTest do
   end
 
   # @tag :pending
-  # test "four of a kind beats a full house" do
-  #   full = ~w(4S 5H 4D 5D 4H)
-  #   four_3s = ~w(3S 3H 2S 3D 3C)
-  #   assert Poker.best_hand([four_3s, full]) == [four_3s]
-  # end
+  test "four of a kind beats a full house" do
+    full = ~w(4S 5H 4D 5D 4H)
+    four_3s = ~w(3S 3H 2S 3D 3C)
+    assert Poker.best_hand([four_3s, full]) == [four_3s]
+  end
 
   # @tag :pending
-  # test "both hands have four of a kind, tie goes to high quad" do
-  #   four_2s = ~w(2S 2H 2C 8D 2D)
-  #   four_5s = ~w(4S 5H 5S 5D 5C)
-  #   assert Poker.best_hand([four_2s, four_5s]) == [four_5s]
-  # end
+  test "four of a kind, on tie, goes to high quad" do
+    four_2s = ~w(2S 2H 2C 8D 2D)
+    four_5s = ~w(4S 5H 5S 5D 5C)
+    assert Poker.best_hand([four_2s, four_5s]) == [four_5s]
+  end
 
   # @tag :pending
-  # test "with multiple decks, both hands with identical four of a kind, tie determined by kicker" do
-  #   four_3s_and_2 = ~w(3S 3H 2S 3D 3C)
-  #   four_3s_and_4 = ~w(3S 3H 4S 3D 3C)
-  #   assert Poker.best_hand([four_3s_and_2, four_3s_and_4]) == [four_3s_and_4]
-  # end
+  test "four of a kind, same quad, tie goes to kicker" do
+    four_3s_and_2 = ~w(3S 3H 2S 3D 3C)
+    four_3s_and_4 = ~w(3S 3H 4S 3D 3C)
+    assert Poker.best_hand([four_3s_and_2, four_3s_and_4]) == [four_3s_and_4]
+  end
 
   # @tag :pending
   # test "straight flush beats four of a kind" do

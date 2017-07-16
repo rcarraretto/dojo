@@ -1,6 +1,7 @@
 defmodule Poker do
 
   @category_ranks %{
+    :four_of_a_kind => 2,
     :full_house => 3,
     :flush => 4,
     :straight => 5,
@@ -21,6 +22,7 @@ defmodule Poker do
       1 -> as_single(hand_t)
       2 -> as_pair(hand_t, groups)
       3 -> as_triplet(hand_t, groups)
+      4 -> as_four_of_a_kind(hand_t, groups)
     end
   end
 
@@ -28,6 +30,17 @@ defmodule Poker do
     hand_t
     |> Enum.group_by(fn({rank, _suit}) -> rank end)
     |> Map.values
+  end
+
+  defp as_four_of_a_kind(hand_t, groups) do
+    quad = groups |> Enum.find(fn(group) -> length(group) == 4 end)
+    quad_value = group_value(quad)
+
+    kicker = hand_t
+    |> Enum.map(&to_value/1)
+    |> Enum.find(fn(value) -> value != quad_value end)
+
+    { :four_of_a_kind, [quad_value, kicker] }
   end
 
   defp as_triplet(hand_t, groups) do
