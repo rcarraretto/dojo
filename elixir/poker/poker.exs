@@ -113,33 +113,27 @@ defmodule Poker do
     cards = groups
     |> Enum.map(fn({_, cards}) -> cards end)
     |> List.flatten
-    if is_sequence?(cards) do
-      categorize_sequence(cards)
+
+    values = values(cards)
+
+    if is_sequence?(values) do
+      categorize_sequence(cards, values)
     else
-      categorize_non_sequence(cards)
+      categorize_non_sequence(cards, values)
     end
   end
 
-  defp is_sequence?(cards) do
-    sorted_values = cards |> Enum.map(&value/1) |> Enum.reverse
-    sequences = sequences(sorted_values)
-    Enum.any?(sequences, &(&1 == sorted_values))
+  defp is_sequence?([14, 5, 4, 3, 2]) do
+    true
   end
 
-  defp sequences([low, _, _, penultimate, 14]) do
-    start_with_ace = low..penultimate |> Enum.to_list |> List.insert_at(-1, 14)
-    end_with_ace = low..14 |> Enum.to_list
-    [start_with_ace, end_with_ace]
+  defp is_sequence?(values) do
+    sequence = List.first(values)..List.last(values) |> Enum.to_list
+    values == sequence
   end
 
-  defp sequences(sorted_values) do
-    sequence = Enum.at(sorted_values, 0)..Enum.at(sorted_values, 4) |> Enum.to_list
-    [sequence]
-  end
-
-  defp categorize_sequence(cards) do
+  defp categorize_sequence(cards, values) do
     category = if same_suit?(cards), do: :straight_flush, else: :straight
-    values = values(cards)
     {category, [highest_sequence_value(values)]}
   end
 
@@ -150,9 +144,9 @@ defmodule Poker do
     end
   end
 
-  defp categorize_non_sequence(cards) do
+  defp categorize_non_sequence(cards, values) do
     category = if same_suit?(cards), do: :flush, else: :high_card
-    {category, values(cards)}
+    {category, values}
   end
 
   defp same_suit?(cards) do
