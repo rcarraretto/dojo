@@ -110,27 +110,18 @@ defmodule Poker do
   end
 
   defp categorize_groups(groups) do
-    sorted_cards = groups
+    cards = groups
     |> Enum.map(fn({_, cards}) -> cards end)
     |> List.flatten
-    sorted_values = sorted_cards |> Enum.map(&value/1) |> Enum.reverse
-    is_same_suit = same_suit?(sorted_cards)
-    is_sequence = is_sequence?(sorted_values)
-    cond do
-      is_same_suit and is_sequence -> as_straight(:straight_flush, sorted_values)
-      is_same_suit -> {:flush, sorted_values |> Enum.reverse}
-      is_sequence -> as_straight(:straight, sorted_values)
-      true -> {:high_card, sorted_values |> Enum.reverse}
+    if is_sequence?(cards) do
+      categorize_sequence(cards)
+    else
+      categorize_non_sequence(cards)
     end
   end
 
-  defp same_suit?(cards) do
-    cards
-    |> Enum.uniq_by(fn({_, suit}) -> suit end)
-    |> length() == 1
-  end
-
-  defp is_sequence?(sorted_values) do
+  defp is_sequence?(cards) do
+    sorted_values = cards |> Enum.map(&value/1) |> Enum.reverse
     sequences = sequences(sorted_values)
     Enum.any?(sequences, &(&1 == sorted_values))
   end
@@ -146,12 +137,28 @@ defmodule Poker do
     [sequence]
   end
 
-  def as_straight(category, sorted_values) do
-    high = case List.last(sorted_values) do
-      14 -> if List.first(sorted_values) == 2, do: 5, else: 14
-      high -> high
+  defp categorize_sequence(cards) do
+    category = if same_suit?(cards), do: :straight_flush, else: :straight
+    values = values(cards)
+    {category, [highest_sequence_value(values)]}
+  end
+
+  defp highest_sequence_value(values) do
+    case {List.first(values), List.last(values)} do
+      {14, 2} -> 5
+      {highest_value, _} -> highest_value
     end
-    {category, [high]}
+  end
+
+  defp categorize_non_sequence(cards) do
+    category = if same_suit?(cards), do: :flush, else: :high_card
+    {category, values(cards)}
+  end
+
+  defp same_suit?(cards) do
+    cards
+    |> Enum.uniq_by(fn({_, suit}) -> suit end)
+    |> length() == 1
   end
 
   defp values(list), do: list |> Enum.map(&value/1)
