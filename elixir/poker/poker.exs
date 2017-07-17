@@ -1,17 +1,5 @@
 defmodule Poker do
 
-  @category_ranks %{
-    :straight_flush => 1,
-    :four_of_a_kind => 2,
-    :full_house => 3,
-    :flush => 4,
-    :straight => 5,
-    :three_of_a_kind => 6,
-    :two_pair => 7,
-    :one_pair => 8,
-    :high_card => 9,
-  }
-
   def best_hand(hands) do
     hands
     |> Enum.map(&with_category/1)
@@ -30,7 +18,7 @@ defmodule Poker do
   end
 
   defp compare_categories({_, category1, _}, {_, category2, _}) do
-    @category_ranks[category1] <= @category_ranks[category2]
+    category_rank(category1) <= category_rank(category2)
   end
 
   defp compare_values([], []) do
@@ -44,6 +32,16 @@ defmodule Poker do
   defp compare_values([value1 | _], [value2 | _]) do
     value1 >= value2
   end
+
+  defp category_rank(:straight_flush), do: 1
+  defp category_rank(:four_of_a_kind), do: 2
+  defp category_rank(:full_house), do: 3
+  defp category_rank(:flush), do: 4
+  defp category_rank(:straight), do: 5
+  defp category_rank(:three_of_a_kind), do: 6
+  defp category_rank(:two_pair), do: 7
+  defp category_rank(:one_pair), do: 8
+  defp category_rank(:high_card), do: 9
 
   defp filter_bests(categories) do
     best = hd(categories)
