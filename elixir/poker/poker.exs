@@ -12,10 +12,6 @@ defmodule Poker do
     :high_card => 9,
   }
 
-  def best_hand([hand]) do
-    [hand]
-  end
-
   def best_hand(hands) do
     hands
     |> Enum.map(&with_category/1)
