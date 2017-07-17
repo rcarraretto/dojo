@@ -5,7 +5,6 @@ defmodule Poker do
     |> Enum.map(&with_category/1)
     |> Enum.sort(&compare_categories/2)
     |> filter_bests()
-    |> Enum.map(&(elem(&1, 0)))
   end
 
   defp with_category(hand) do
@@ -47,6 +46,7 @@ defmodule Poker do
     best = hd(categories)
     categories
     |> Enum.take_while(fn(category) -> compare_categories(category, best) end)
+    |> Enum.map(&(elem(&1, 0)))
   end
 
   def categorize(hand) do
