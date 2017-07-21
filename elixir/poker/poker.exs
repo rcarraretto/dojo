@@ -60,15 +60,7 @@ defmodule Poker do
     cards
     |> Enum.group_by(fn({rank, _suit}) -> rank end)
     |> Enum.map(fn({_rank, cards}) -> {length(cards), cards} end)
-    |> Enum.sort(&compare_groups/2)
-  end
-
-  defp compare_groups({length, cards1}, {length, cards2}) do
-    value(cards1) >= value(cards2)
-  end
-
-  defp compare_groups({length1, _}, {length2, _}) do
-    length1 >= length2
+    |> Enum.sort(&>=/2)
   end
 
   defp categorize_groups([{4, quad}, {1, kicker}]) do
