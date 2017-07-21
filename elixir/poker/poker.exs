@@ -2,33 +2,30 @@ defmodule Poker do
 
   def best_hand(hands) do
     hands
-    |> Enum.map(&with_category/1)
+    |> Enum.map(&with_score/1)
     |> Enum.sort(&compare_categories/2)
     |> filter_bests()
   end
 
-  defp with_category(hand) do
-    category = categorize(hand)
-    Tuple.insert_at(category, 0, hand)
+  defp with_score(hand) do
+    {category, values} = categorize(hand)
+    score = [category_rank(category), values]
+    {hand, score}
   end
 
-  defp compare_categories({_, category, values1}, {_, category, values2}) do
-    values1 >= values2
+  defp compare_categories({_, score1}, {_, score2}) do
+    score1 >= score2
   end
 
-  defp compare_categories({_, category1, _}, {_, category2, _}) do
-    category_rank(category1) <= category_rank(category2)
-  end
-
-  defp category_rank(:straight_flush), do: 1
-  defp category_rank(:four_of_a_kind), do: 2
-  defp category_rank(:full_house), do: 3
-  defp category_rank(:flush), do: 4
+  defp category_rank(:straight_flush), do: 9
+  defp category_rank(:four_of_a_kind), do: 8
+  defp category_rank(:full_house), do: 7
+  defp category_rank(:flush), do: 6
   defp category_rank(:straight), do: 5
-  defp category_rank(:three_of_a_kind), do: 6
-  defp category_rank(:two_pair), do: 7
-  defp category_rank(:one_pair), do: 8
-  defp category_rank(:high_card), do: 9
+  defp category_rank(:three_of_a_kind), do: 4
+  defp category_rank(:two_pair), do: 3
+  defp category_rank(:one_pair), do: 2
+  defp category_rank(:high_card), do: 1
 
   defp filter_bests(categories) do
     best = hd(categories)
