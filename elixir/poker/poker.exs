@@ -46,7 +46,7 @@ defmodule Poker do
   end
 
   defp card_to_tuple(card) do
-    [rank, suit] = Regex.run(~r/(.*)([CDHS])/, card, capture: :all_but_first)
+    {rank, suit} = String.split_at(card, -1)
     {rank_value(rank), suit}
   end
 
