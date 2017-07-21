@@ -35,11 +35,15 @@ defmodule Poker do
   end
 
   def categorize(hand) do
-    hand |> hand_to_tuples() |> group_by_rank() |> categorize_groups()
+    cards = hand_to_tuples(hand)
+    groups = group_by_rank(cards)
+    category = categorize_groups(cards, groups)
+    values = category_values(category, cards, groups)
+    {category, values}
   end
 
   defp hand_to_tuples(hand) do
-    hand |> Enum.map(&card_to_tuple/1)
+    hand |> Enum.map(&card_to_tuple/1) |>  Enum.sort(&>=/2)
   end
 
   defp card_to_tuple(card) do
@@ -60,37 +64,24 @@ defmodule Poker do
     |> Enum.sort(&>=/2)
   end
 
-  defp categorize_groups([{4, quad}, {1, kicker}]) do
-    {:four_of_a_kind, values([quad, kicker])}
+  defp categorize_groups(cards, groups) do
+    case Enum.map(groups, &(elem(&1, 0))) do
+      [4, 1] -> :four_of_a_kind
+      [3, 2] -> :full_house
+      [3, 1, 1] -> :three_of_a_kind
+      [2, 2, 1] -> :two_pair
+      [2, 1, 1, 1] -> :one_pair
+      _ -> categorize_distinct(cards)
+    end
   end
 
-  defp categorize_groups([{3, triplet}, {2, pair}]) do
-    {:full_house, values([triplet, pair])}
-  end
-
-  defp categorize_groups([{3, triplet}, {1, high_card}, {1, low_card}]) do
-    {:three_of_a_kind, values([triplet, high_card, low_card])}
-  end
-
-  defp categorize_groups([{2, high_pair}, {2, low_pair}, {1, kicker}]) do
-    {:two_pair, values([high_pair, low_pair, kicker])}
-  end
-
-  defp categorize_groups([{2, pair} | _]) do
-    {:one_pair, values([pair])}
-  end
-
-  defp categorize_groups(cards_by_rank) do
-    cards = cards_by_rank
-    |> Enum.map(fn({_rank, cards}) -> cards end)
-    |> List.flatten
-
+  defp categorize_distinct(cards) do
     values = values(cards)
-
-    if is_sequence?(values) do
-      categorize_sequence(cards, values)
-    else
-      categorize_non_sequence(cards, values)
+    case [is_sequence?(values), same_suit?(cards)] do
+      [true, true] -> :straight_flush
+      [true, false] -> :straight
+      [false, true] -> :flush
+      _ -> :high_card
     end
   end
 
@@ -103,27 +94,31 @@ defmodule Poker do
     values == sequence
   end
 
-  defp categorize_sequence(cards, values) do
-    category = if same_suit?(cards), do: :straight_flush, else: :straight
-    {category, [highest_sequence_value(values)]}
-  end
-
-  defp highest_sequence_value(values) do
-    case {List.first(values), List.last(values)} do
-      {14, 2} -> 5
-      {highest_value, _} -> highest_value
-    end
-  end
-
-  defp categorize_non_sequence(cards, values) do
-    category = if same_suit?(cards), do: :flush, else: :high_card
-    {category, values}
-  end
-
   defp same_suit?(cards) do
     cards
     |> Enum.uniq_by(fn({_rank, suit}) -> suit end)
     |> length() == 1
+  end
+
+  defp category_values(:straight, cards, _) do
+    highest_sequence_value(cards)
+  end
+
+  defp category_values(:straight_flush, cards, _) do
+    highest_sequence_value(cards)
+  end
+
+  defp category_values(_, _, groups) do
+    cards_by_group = Enum.map(groups, &(elem(&1, 1)))
+    Enum.map(cards_by_group, &(value(&1)))
+  end
+
+  defp highest_sequence_value(cards) do
+    values = values(cards)
+    case {List.first(values), List.last(values)} do
+      {14, 2} -> 5
+      {highest_value, _} -> highest_value
+    end
   end
 
   defp values(list), do: list |> Enum.map(&value/1)

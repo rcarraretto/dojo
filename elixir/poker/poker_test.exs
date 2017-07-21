@@ -12,19 +12,19 @@ defmodule PokerTest do
     assert Poker.categorize(~w(4D 5S 6S 8D 3C)) == { :high_card, [8, 6, 5, 4, 3] }
     assert Poker.categorize(~w(2S 4C 7S 9H 10H)) == { :high_card, [10, 9, 7, 4, 2] }
     assert Poker.categorize(~w(4S 5S 7H 8D JC)) == { :high_card, [11, 8, 7, 5, 4] }
-    assert Poker.categorize(~w(2S 4H 6S 4D JH)) == { :one_pair, [4] }
+    assert Poker.categorize(~w(2S 4H 6S 4D JH)) == { :one_pair, [4, 11, 6, 2] }
     assert Poker.categorize(~w(4S 5H 4C 8C 5C)) == { :two_pair, [5, 4, 8] }
     assert Poker.categorize(~w(4S 5H 4C 8S 4H)) == { :three_of_a_kind, [4, 8, 5] }
-    assert Poker.categorize(~w(3S 4D 2S 6D 5C)) == { :straight, [6] }
-    assert Poker.categorize(~w(4D AH 3S 2D 5C)) == { :straight, [5] }
-    assert Poker.categorize(~w(10D JH QS KD AC)) == { :straight, [14] }
+    assert Poker.categorize(~w(3S 4D 2S 6D 5C)) == { :straight, 6 }
+    assert Poker.categorize(~w(4D AH 3S 2D 5C)) == { :straight, 5 }
+    assert Poker.categorize(~w(10D JH QS KD AC)) == { :straight, 14 }
     assert Poker.categorize(~w(2S 4S 5S 6S 7S)) == { :flush, [7, 6, 5, 4, 2] }
     assert Poker.categorize(~w(4S 5H 4C 5D 4H)) == { :full_house, [4, 5] }
     assert Poker.categorize(~w(3S 3H 2S 3D 3C)) == { :four_of_a_kind, [3, 2] }
     assert Poker.categorize(~w(7S 8S 9S 6S 10S)) ==
-      { :straight_flush, [10] }
-    assert Poker.categorize(~w(4D AD 3D 2D 5D)) == { :straight_flush, [5] }
-    assert Poker.categorize(~w(10H JH QH KH AH)) == { :straight_flush, [14] }
+      { :straight_flush, 10 }
+    assert Poker.categorize(~w(4D AD 3D 2D 5D)) == { :straight_flush, 5 }
+    assert Poker.categorize(~w(10H JH QH KH AH)) == { :straight_flush, 14 }
   end
 
   # @tag :pending
