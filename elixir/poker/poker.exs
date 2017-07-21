@@ -3,18 +3,16 @@ defmodule Poker do
   def best_hand(hands) do
     hands
     |> Enum.map(&with_score/1)
-    |> Enum.sort(&compare_categories/2)
-    |> filter_bests()
+    |> Enum.sort_by(&(elem(&1, 1)), &>=/2)
+    |> Enum.chunk_by(&(elem(&1, 1)))
+    |> List.first()
+    |> Enum.map(&(elem(&1, 0)))
   end
 
   defp with_score(hand) do
-    {category, values} = categorize(hand)
+    {category, values} = HandCategory.for(hand)
     score = [category_rank(category), values]
     {hand, score}
-  end
-
-  defp compare_categories({_, score1}, {_, score2}) do
-    score1 >= score2
   end
 
   defp category_rank(:straight_flush), do: 9
@@ -26,15 +24,11 @@ defmodule Poker do
   defp category_rank(:two_pair), do: 3
   defp category_rank(:one_pair), do: 2
   defp category_rank(:high_card), do: 1
+end
 
-  defp filter_bests(categories) do
-    best = hd(categories)
-    categories
-    |> Enum.take_while(fn(category) -> compare_categories(category, best) end)
-    |> Enum.map(&(elem(&1, 0)))
-  end
+defmodule HandCategory do
 
-  def categorize(hand) do
+  def for(hand) do
     cards = hand_to_tuples(hand)
     groups = group_by_rank(cards)
     category = categorize_groups(cards, groups)
@@ -43,7 +37,7 @@ defmodule Poker do
   end
 
   defp hand_to_tuples(hand) do
-    hand |> Enum.map(&card_to_tuple/1) |>  Enum.sort(&>=/2)
+    hand |> Enum.map(&card_to_tuple/1) |> Enum.sort(&>=/2)
   end
 
   defp card_to_tuple(card) do
