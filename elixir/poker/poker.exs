@@ -1,18 +1,10 @@
-defmodule Poker do
+defmodule Hand do
+  defstruct cards: [], score: 0
 
-  def best_hand(hands) do
-    hands
-    |> Enum.map(&with_score/1)
-    |> Enum.sort_by(&(elem(&1, 1)), &>=/2)
-    |> Enum.chunk_by(&(elem(&1, 1)))
-    |> List.first()
-    |> Enum.map(&(elem(&1, 0)))
-  end
-
-  defp with_score(hand) do
-    {category, values} = HandCategory.for(hand)
+  def from_cards(cards) do
+    {category, values} = HandCategory.for(cards)
     score = [category_rank(category), values]
-    {hand, score}
+    %Hand{cards: cards, score: score}
   end
 
   defp category_rank(:straight_flush), do: 9
@@ -24,6 +16,18 @@ defmodule Poker do
   defp category_rank(:two_pair), do: 3
   defp category_rank(:one_pair), do: 2
   defp category_rank(:high_card), do: 1
+end
+
+defmodule Poker do
+
+  def best_hand(hands) do
+    hands
+    |> Enum.map(&Hand.from_cards/1)
+    |> Enum.sort_by(&(&1.score), &>=/2)
+    |> Enum.chunk_by(&(&1.score))
+    |> List.first()
+    |> Enum.map(&(&1.cards))
+  end
 end
 
 defmodule HandCategory do
