@@ -32,6 +32,8 @@ end
 
 defmodule HandCategory do
 
+  @five_high_straight [14, 5, 4, 3, 2]
+
   def for(hand) do
     cards    = hand_to_tuples(hand)
     groups   = group_by_rank(cards)
@@ -102,7 +104,7 @@ defmodule HandCategory do
     {category, values}
   end
 
-  defp is_sequence?([14, 5, 4, 3, 2]) do
+  defp is_sequence?(@five_high_straight) do
     true
   end
 
@@ -117,12 +119,8 @@ defmodule HandCategory do
     |> length() == 1
   end
 
-  defp highest_sequence_value(values) do
-    case {List.first(values), List.last(values)} do
-      {14, 2} -> 5
-      {highest_value, _} -> highest_value
-    end
-  end
+  defp highest_sequence_value(@five_high_straight), do: 5
+  defp highest_sequence_value(values),              do: List.first(values)
 
   defp values(list), do: list |> Enum.map(&value/1)
 
