@@ -7,15 +7,15 @@ defmodule Hand do
     %Hand{cards: cards, score: score}
   end
 
-  defp category_rank(:straight_flush), do: 9
-  defp category_rank(:four_of_a_kind), do: 8
-  defp category_rank(:full_house), do: 7
-  defp category_rank(:flush), do: 6
-  defp category_rank(:straight), do: 5
+  defp category_rank(:straight_flush),  do: 9
+  defp category_rank(:four_of_a_kind),  do: 8
+  defp category_rank(:full_house),      do: 7
+  defp category_rank(:flush),           do: 6
+  defp category_rank(:straight),        do: 5
   defp category_rank(:three_of_a_kind), do: 4
-  defp category_rank(:two_pair), do: 3
-  defp category_rank(:one_pair), do: 2
-  defp category_rank(:high_card), do: 1
+  defp category_rank(:two_pair),        do: 3
+  defp category_rank(:one_pair),        do: 2
+  defp category_rank(:high_card),       do: 1
 end
 
 defmodule Poker do
@@ -33,10 +33,10 @@ end
 defmodule HandCategory do
 
   def for(hand) do
-    cards = hand_to_tuples(hand)
-    groups = group_by_rank(cards)
+    cards    = hand_to_tuples(hand)
+    groups   = group_by_rank(cards)
     category = categorize_groups(cards, groups)
-    values = category_values(category, cards, groups)
+    values   = category_values(category, cards, groups)
     {category, values}
   end
 
@@ -49,10 +49,10 @@ defmodule HandCategory do
     {rank_value(rank), suit}
   end
 
-  defp rank_value("A"), do: 14
-  defp rank_value("K"), do: 13
-  defp rank_value("Q"), do: 12
-  defp rank_value("J"), do: 11
+  defp rank_value("A"),  do: 14
+  defp rank_value("K"),  do: 13
+  defp rank_value("Q"),  do: 12
+  defp rank_value("J"),  do: 11
   defp rank_value(rank), do: String.to_integer(rank)
 
   defp group_by_rank(cards) do
@@ -64,22 +64,22 @@ defmodule HandCategory do
 
   defp categorize_groups(cards, groups) do
     case Enum.map(groups, &(elem(&1, 0))) do
-      [4, 1] -> :four_of_a_kind
-      [3, 2] -> :full_house
-      [3, 1, 1] -> :three_of_a_kind
-      [2, 2, 1] -> :two_pair
+      [4, 1]       -> :four_of_a_kind
+      [3, 2]       -> :full_house
+      [3, 1, 1]    -> :three_of_a_kind
+      [2, 2, 1]    -> :two_pair
       [2, 1, 1, 1] -> :one_pair
-      _ -> categorize_distinct(cards)
+      _            -> categorize_distinct(cards)
     end
   end
 
   defp categorize_distinct(cards) do
     values = values(cards)
     case [is_sequence?(values), same_suit?(cards)] do
-      [true, true] -> :straight_flush
+      [true, true]  -> :straight_flush
       [true, false] -> :straight
       [false, true] -> :flush
-      _ -> :high_card
+      _             -> :high_card
     end
   end
 
