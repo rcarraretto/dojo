@@ -13,23 +13,11 @@ defmodule Poker do
   end
 
   defp compare_categories({_, category, values1}, {_, category, values2}) do
-    compare_values(values1, values2)
+    values1 >= values2
   end
 
   defp compare_categories({_, category1, _}, {_, category2, _}) do
     category_rank(category1) <= category_rank(category2)
-  end
-
-  defp compare_values([], []) do
-    true
-  end
-
-  defp compare_values([value | values1], [value | values2]) do
-    compare_values(values1, values2)
-  end
-
-  defp compare_values([value1 | _], [value2 | _]) do
-    value1 >= value2
   end
 
   defp category_rank(:straight_flush), do: 1
