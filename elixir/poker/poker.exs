@@ -1,3 +1,18 @@
+defmodule Card do
+  defstruct [:rank, :suit]
+
+  def new(str) do
+    {rank, suit} = String.split_at(str, -1)
+    %Card{rank: rank_value(rank), suit: suit}
+  end
+
+  defp rank_value("A"),  do: 14
+  defp rank_value("K"),  do: 13
+  defp rank_value("Q"),  do: 12
+  defp rank_value("J"),  do: 11
+  defp rank_value(rank), do: String.to_integer(rank)
+end
+
 defmodule Hand do
   defstruct cards: [], score: 0
 
@@ -45,23 +60,12 @@ defmodule HandCategory do
   end
 
   defp hand_to_tuples(hand) do
-    hand |> Enum.map(&card_to_tuple/1) |> Enum.sort(&>=/2)
+    hand |> Enum.map(&Card.new/1) |> Enum.sort(&>=/2)
   end
-
-  defp card_to_tuple(card) do
-    {rank, suit} = String.split_at(card, -1)
-    {rank_value(rank), suit}
-  end
-
-  defp rank_value("A"),  do: 14
-  defp rank_value("K"),  do: 13
-  defp rank_value("Q"),  do: 12
-  defp rank_value("J"),  do: 11
-  defp rank_value(rank), do: String.to_integer(rank)
 
   defp group_by_rank(cards) do
     cards
-    |> Enum.group_by(fn({rank, _suit}) -> rank end)
+    |> Enum.group_by(&(&1.rank))
     |> Enum.map(fn({_rank, cards}) -> {length(cards), cards} end)
     |> Enum.sort(&>=/2)
   end
@@ -114,9 +118,7 @@ defmodule HandCategory do
   end
 
   defp same_suit?(cards) do
-    cards
-    |> Enum.uniq_by(fn({_rank, suit}) -> suit end)
-    |> length() == 1
+    cards |> Enum.uniq_by(&(&1.suit)) |> length() == 1
   end
 
   defp highest_sequence_value(@five_high_straight), do: 5
@@ -124,6 +126,6 @@ defmodule HandCategory do
 
   defp values(list), do: list |> Enum.map(&value/1)
 
-  defp value([{rank, _suit} | _cards]), do: rank
-  defp value({rank, _suit}), do: rank
+  defp value([card | _cards]), do: card.rank
+  defp value(card), do: card.rank
 end
