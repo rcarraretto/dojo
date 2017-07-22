@@ -15,9 +15,9 @@ end
 
 defmodule CardGroups do
 
-  def new(cards) do
+  def categorize(cards) do
     groups = group_by_rank(cards)
-    {categorize(groups), values(groups)}
+    {categorize_groups(groups), values(groups)}
   end
 
   defp group_by_rank(cards) do
@@ -27,7 +27,7 @@ defmodule CardGroups do
     |> Enum.sort(&>=/2)
   end
 
-  defp categorize(groups) do
+  defp categorize_groups(groups) do
     case Enum.map(groups, &(elem(&1, 0))) do
       [4, 1]       -> :four_of_a_kind
       [3, 2]       -> :full_house
@@ -46,52 +46,11 @@ defmodule CardGroups do
   defp group_value([card | _cards]), do: card.rank
 end
 
-defmodule Hand do
-  defstruct cards: [], score: 0
-
-  def from_cards(cards) do
-    {category, values} = HandCategory.for(cards)
-    score = [category_rank(category), values]
-    %Hand{cards: cards, score: score}
-  end
-
-  defp category_rank(:straight_flush),  do: 9
-  defp category_rank(:four_of_a_kind),  do: 8
-  defp category_rank(:full_house),      do: 7
-  defp category_rank(:flush),           do: 6
-  defp category_rank(:straight),        do: 5
-  defp category_rank(:three_of_a_kind), do: 4
-  defp category_rank(:two_pair),        do: 3
-  defp category_rank(:one_pair),        do: 2
-  defp category_rank(:high_card),       do: 1
-end
-
-defmodule Poker do
-
-  def best_hand(hands) do
-    hands
-    |> Enum.map(&Hand.from_cards/1)
-    |> Enum.sort_by(&(&1.score), &>=/2)
-    |> Enum.chunk_by(&(&1.score))
-    |> List.first()
-    |> Enum.map(&(&1.cards))
-  end
-end
-
-defmodule HandCategory do
+defmodule DistinctCards do
 
   @five_high_straight [14, 5, 4, 3, 2]
 
-  def for(hand) do
-    cards = Enum.map(hand, &Card.new/1)
-    { category, values } = CardGroups.new(cards)
-    case category do
-      :distinct -> for_distinct(cards, values)
-      _         -> { category, values }
-    end
-  end
-
-  defp for_distinct(cards, values) do
+  def categorize(cards, values) do
     straight = is_sequence?(values)
     flush = same_suit?(cards)
 
@@ -126,4 +85,48 @@ defmodule HandCategory do
 
   defp highest_sequence_value(@five_high_straight), do: 5
   defp highest_sequence_value(values),              do: List.first(values)
+end
+
+defmodule HandCategory do
+
+  def for(hand) do
+    cards = Enum.map(hand, &Card.new/1)
+    categorization = CardGroups.categorize(cards)
+    case categorization do
+      {:distinct, values} -> DistinctCards.categorize(cards, values)
+      _                   -> categorization
+    end
+  end
+end
+
+defmodule Hand do
+  defstruct cards: [], score: 0
+
+  def from_cards(cards) do
+    {category, values} = HandCategory.for(cards)
+    score = [category_rank(category), values]
+    %Hand{cards: cards, score: score}
+  end
+
+  defp category_rank(:straight_flush),  do: 9
+  defp category_rank(:four_of_a_kind),  do: 8
+  defp category_rank(:full_house),      do: 7
+  defp category_rank(:flush),           do: 6
+  defp category_rank(:straight),        do: 5
+  defp category_rank(:three_of_a_kind), do: 4
+  defp category_rank(:two_pair),        do: 3
+  defp category_rank(:one_pair),        do: 2
+  defp category_rank(:high_card),       do: 1
+end
+
+defmodule Poker do
+
+  def best_hand(hands) do
+    hands
+    |> Enum.map(&Hand.from_cards/1)
+    |> Enum.sort_by(&(&1.score), &>=/2)
+    |> Enum.chunk_by(&(&1.score))
+    |> List.first()
+    |> Enum.map(&(&1.cards))
+  end
 end
