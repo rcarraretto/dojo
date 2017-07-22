@@ -54,8 +54,8 @@ defmodule HandCategory do
     groups   = group_by_rank(cards)
     category = categorize_groups(groups)
     case category do
-      :no_groups -> for_distinct(cards)
-      _ -> for_groups(category, groups)
+      :distinct -> for_distinct(cards)
+      _         -> for_groups(category, groups)
     end
   end
 
@@ -77,7 +77,7 @@ defmodule HandCategory do
       [3, 1, 1]    -> :three_of_a_kind
       [2, 2, 1]    -> :two_pair
       [2, 1, 1, 1] -> :one_pair
-      _            -> :no_groups
+      _            -> :distinct
     end
   end
 
