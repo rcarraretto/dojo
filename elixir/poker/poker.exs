@@ -83,7 +83,7 @@ defmodule HandCategory do
 
   defp for_groups(category, groups) do
     cards_by_group = Enum.map(groups, &(elem(&1, 1)))
-    values = Enum.map(cards_by_group, &(value(&1)))
+    values = Enum.map(cards_by_group, &(group_value(&1)))
     {category, values}
   end
 
@@ -124,8 +124,6 @@ defmodule HandCategory do
   defp highest_sequence_value(@five_high_straight), do: 5
   defp highest_sequence_value(values),              do: List.first(values)
 
-  defp values(list), do: list |> Enum.map(&value/1)
-
-  defp value([card | _cards]), do: card.rank
-  defp value(card), do: card.rank
+  defp group_value([card | _cards]), do: card.rank
+  defp values(cards), do: Enum.map(cards, &(&1.rank))
 end
