@@ -47,40 +47,42 @@ defmodule CardGroups do
 end
 
 defmodule DistinctCards do
+  defstruct [:straight, :flush, :values]
 
   @five_high_straight [14, 5, 4, 3, 2]
 
   def categorize(cards, values) do
-    straight = is_sequence?(values)
-    flush = same_suit?(cards)
-
-    category = case [straight, flush] do
-      [true, true]  -> :straight_flush
-      [true, false] -> :straight
-      [false, true] -> :flush
-      _             -> :high_card
-    end
-
-    values = if straight do
-      highest_sequence_value(values)
-    else
-      values
-    end
-
-    {category, values}
+    dcards = %DistinctCards{
+      straight: straight?(values),
+      flush: flush?(cards),
+      values: values
+    }
+    {_categorize(dcards), _values(dcards, values)}
   end
 
-  defp is_sequence?(@five_high_straight) do
+  defp straight?(@five_high_straight) do
     true
   end
 
-  defp is_sequence?(values) do
+  defp straight?(values) do
     sequence = List.first(values)..List.last(values) |> Enum.to_list
     values == sequence
   end
 
-  defp same_suit?(cards) do
+  defp flush?(cards) do
     cards |> Enum.uniq_by(&(&1.suit)) |> length() == 1
+  end
+
+  defp _categorize(%DistinctCards{straight: true, flush: true}),  do: :straight_flush
+  defp _categorize(%DistinctCards{straight: true, flush: false}), do: :straight
+  defp _categorize(%DistinctCards{flush: true}),                  do: :flush
+  defp _categorize(_),                                            do: :high_card
+
+  defp _values(%DistinctCards{straight: true}, values) do
+    highest_sequence_value(values)
+  end
+  defp _values(_, values) do
+    values
   end
 
   defp highest_sequence_value(@five_high_straight), do: 5
@@ -99,13 +101,13 @@ defmodule HandCategory do
   end
 end
 
-defmodule Hand do
+defmodule HandWithScore do
   defstruct cards: [], score: 0
 
-  def from_cards(cards) do
+  def new(cards) do
     {category, values} = HandCategory.for(cards)
     score = [category_rank(category), values]
-    %Hand{cards: cards, score: score}
+    %HandWithScore{cards: cards, score: score}
   end
 
   defp category_rank(:straight_flush),  do: 9
@@ -123,7 +125,7 @@ defmodule Poker do
 
   def best_hand(hands) do
     hands
-    |> Enum.map(&Hand.from_cards/1)
+    |> Enum.map(&HandWithScore.new/1)
     |> Enum.sort_by(&(&1.score), &>=/2)
     |> Enum.chunk_by(&(&1.score))
     |> List.first()
