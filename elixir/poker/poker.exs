@@ -73,20 +73,21 @@ defmodule DistinctCards do
     cards |> Enum.uniq_by(&(&1.suit)) |> length() == 1
   end
 
-  defp _categorize(%DistinctCards{straight: true, flush: true}),  do: :straight_flush
-  defp _categorize(%DistinctCards{straight: true, flush: false}), do: :straight
-  defp _categorize(%DistinctCards{flush: true}),                  do: :flush
-  defp _categorize(_),                                            do: :high_card
+  defp _categorize(%DistinctCards{straight: true, flush: true}), do: :straight_flush
+  defp _categorize(%DistinctCards{straight: true}),              do: :straight
+  defp _categorize(%DistinctCards{flush: true}),                 do: :flush
+  defp _categorize(_),                                           do: :high_card
 
   defp _values(%DistinctCards{straight: true}, values) do
-    highest_sequence_value(values)
+    case values do
+      @five_high_straight -> 5
+      _                   -> List.first(values)
+    end
   end
+
   defp _values(_, values) do
     values
   end
-
-  defp highest_sequence_value(@five_high_straight), do: 5
-  defp highest_sequence_value(values),              do: List.first(values)
 end
 
 defmodule HandCategory do
