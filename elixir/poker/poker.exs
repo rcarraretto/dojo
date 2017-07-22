@@ -28,7 +28,8 @@ defmodule CardGroups do
   end
 
   defp categorize_groups(groups) do
-    case Enum.map(groups, &(elem(&1, 0))) do
+    lengths = Enum.map(groups, &(elem(&1, 0)))
+    case lengths do
       [4, 1]       -> :four_of_a_kind
       [3, 2]       -> :full_house
       [3, 1, 1]    -> :three_of_a_kind
@@ -52,12 +53,12 @@ defmodule DistinctCards do
   @five_high_straight [14, 5, 4, 3, 2]
 
   def categorize(cards, values) do
-    dcards = %DistinctCards{
+    distinct = %DistinctCards{
       straight: straight?(values),
       flush: flush?(cards),
       values: values
     }
-    {_categorize(dcards), _values(dcards, values)}
+    {_categorize(distinct), _values(distinct, values)}
   end
 
   defp straight?(@five_high_straight) do
@@ -78,16 +79,9 @@ defmodule DistinctCards do
   defp _categorize(%DistinctCards{flush: true}),                 do: :flush
   defp _categorize(_),                                           do: :high_card
 
-  defp _values(%DistinctCards{straight: true}, values) do
-    case values do
-      @five_high_straight -> 5
-      _                   -> List.first(values)
-    end
-  end
-
-  defp _values(_, values) do
-    values
-  end
+  defp _values(_, @five_high_straight),                 do: 5
+  defp _values(%DistinctCards{straight: true}, values), do: List.first(values)
+  defp _values(_, values),                              do: values
 end
 
 defmodule HandCategory do
