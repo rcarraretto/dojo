@@ -29,20 +29,23 @@ defmodule Say do
     groups
     |> Enum.with_index()
     |> Enum.map(&group_eng/1)
+    |> Enum.reject(&is_nil/1)
     |> Enum.reverse()
     |> Enum.join(" ")
-    |> String.trim()
   end
 
   defp group_eng({0, _group_index}) do
-    ""
+    nil
+  end
+
+  defp group_eng({num_3d, 0}) do
+    "#{num_3d_eng(num_3d)}"
   end
 
   defp group_eng({num_3d, group_index}) do
     "#{num_3d_eng(num_3d)} #{group_name(group_index)}"
   end
 
-  defp group_name(0), do: ""
   defp group_name(1), do: "thousand"
   defp group_name(2), do: "million"
   defp group_name(3), do: "billion"
@@ -51,7 +54,7 @@ defmodule Say do
     hundreds = div(num_3d, 100)
     case hundreds do
       0 -> "#{num_2d_eng(num_3d)}"
-      _ -> "#{num_2d_eng(hundreds)} hundred #{num_2d_eng(num_3d)}"
+      _ -> String.trim("#{num_2d_eng(hundreds)} hundred #{num_2d_eng(num_3d)}")
     end
   end
 
