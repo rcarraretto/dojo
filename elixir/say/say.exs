@@ -29,7 +29,7 @@ defmodule Say do
     groups
     |> Enum.with_index()
     |> Enum.map(&group_eng/1)
-    |> Enum.reverse
+    |> Enum.reverse()
     |> Enum.join(" ")
     |> String.trim()
   end
