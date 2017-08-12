@@ -55,58 +55,47 @@ defmodule Say do
 
   defp num_3d_eng(num_3d) do
     hundreds = div(num_3d, 100)
-    num_2d = rem(num_3d, 100)
-    tens = div(num_2d, 10)
-    ones = rem(num_2d, 10)
-    tuple_eng({num_3d, hundreds, tens, ones})
-  end
-
-  defp tuple_eng({number, 0, tens, ones}) do
-    "#{num_2d_eng({number, tens, ones})}"
-  end
-
-  defp tuple_eng({number, hundreds, tens, ones}) do
-    "#{num_eng(hundreds)} hundred #{num_2d_eng({number, tens, ones})}"
-  end
-
-  defp num_2d_eng({number, tens, ones}) do
-    num_2d = rem(number, 100)
-    eng = num_eng(num_2d)
-    if eng do
-      eng
-    else
-      [num_eng(tens * 10), num_eng(ones)]
-      |> Enum.filter(&(&1 != nil))
-      |> Enum.join("-")
+    case hundreds do
+      0 -> "#{num_2d_eng(num_3d)}"
+      _ -> "#{num_2d_eng(hundreds)} hundred #{num_2d_eng(num_3d)}"
     end
   end
 
-  defp num_eng(1), do: "one"
-  defp num_eng(2), do: "two"
-  defp num_eng(3), do: "three"
-  defp num_eng(4), do: "four"
-  defp num_eng(5), do: "five"
-  defp num_eng(6), do: "six"
-  defp num_eng(7), do: "seven"
-  defp num_eng(8), do: "eight"
-  defp num_eng(9), do: "nine"
-  defp num_eng(10), do: "ten"
-  defp num_eng(11), do: "eleven"
-  defp num_eng(12), do: "twelve"
-  defp num_eng(13), do: "thirteen"
-  defp num_eng(14), do: "fourteen"
-  defp num_eng(15), do: "fifteen"
-  defp num_eng(16), do: "sixteen"
-  defp num_eng(17), do: "seventeen"
-  defp num_eng(18), do: "eighteen"
-  defp num_eng(19), do: "nineteen"
-  defp num_eng(20), do: "twenty"
-  defp num_eng(30), do: "thirty"
-  defp num_eng(40), do: "forty"
-  defp num_eng(50), do: "fifty"
-  defp num_eng(60), do: "sixty"
-  defp num_eng(70), do: "seventy"
-  defp num_eng(80), do: "eighty"
-  defp num_eng(90), do: "ninty"
-  defp num_eng(_), do: nil
+  defp num_2d_eng(0), do: nil
+  defp num_2d_eng(1), do: "one"
+  defp num_2d_eng(2), do: "two"
+  defp num_2d_eng(3), do: "three"
+  defp num_2d_eng(4), do: "four"
+  defp num_2d_eng(5), do: "five"
+  defp num_2d_eng(6), do: "six"
+  defp num_2d_eng(7), do: "seven"
+  defp num_2d_eng(8), do: "eight"
+  defp num_2d_eng(9), do: "nine"
+  defp num_2d_eng(10), do: "ten"
+  defp num_2d_eng(11), do: "eleven"
+  defp num_2d_eng(12), do: "twelve"
+  defp num_2d_eng(13), do: "thirteen"
+  defp num_2d_eng(14), do: "fourteen"
+  defp num_2d_eng(15), do: "fifteen"
+  defp num_2d_eng(16), do: "sixteen"
+  defp num_2d_eng(17), do: "seventeen"
+  defp num_2d_eng(18), do: "eighteen"
+  defp num_2d_eng(19), do: "nineteen"
+  defp num_2d_eng(20), do: "twenty"
+  defp num_2d_eng(30), do: "thirty"
+  defp num_2d_eng(40), do: "forty"
+  defp num_2d_eng(50), do: "fifty"
+  defp num_2d_eng(60), do: "sixty"
+  defp num_2d_eng(70), do: "seventy"
+  defp num_2d_eng(80), do: "eighty"
+  defp num_2d_eng(90), do: "ninty"
+
+  defp num_2d_eng(num_3d) do
+    num_2d = rem(num_3d, 100)
+    tens = div(num_2d, 10)
+    ones = rem(num_2d, 10)
+    [num_2d_eng(tens * 10), num_2d_eng(ones)]
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join("-")
+  end
 end
