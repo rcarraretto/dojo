@@ -29,10 +29,7 @@ defmodule Say do
     length = length(groups)
     groups
     |> Enum.with_index()
-    |> Enum.reduce([], fn({num_3d, index}, acc) ->
-      [group_eng(num_3d, length - index) | acc]
-    end)
-    |> Enum.reverse()
+    |> Enum.map(fn({num_3d, index}) -> group_eng(num_3d, length - index) end)
     |> Enum.join(" ")
     |> String.trim()
   end
