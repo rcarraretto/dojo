@@ -21,8 +21,8 @@ defmodule Say do
     acc
   end
 
-  defp _groups_of_3d(memo, acc) do
-    _groups_of_3d(div(memo, 1000), [rem(memo, 1000) | acc])
+  defp _groups_of_3d(number, acc) do
+    _groups_of_3d(div(number, 1000), [rem(number, 1000) | acc])
   end
 
   defp groups_eng(groups) do
