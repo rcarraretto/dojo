@@ -18,7 +18,7 @@ defmodule Say do
   end
 
   defp _groups_of_3d(0, acc) do
-    acc
+    Enum.reverse(acc)
   end
 
   defp _groups_of_3d(number, acc) do
@@ -26,29 +26,29 @@ defmodule Say do
   end
 
   defp groups_eng(groups) do
-    length = length(groups)
     groups
     |> Enum.with_index()
-    |> Enum.map(fn({num_3d, index}) -> group_eng(num_3d, length - index) end)
+    |> Enum.map(&group_eng/1)
+    |> Enum.reverse
     |> Enum.join(" ")
     |> String.trim()
   end
 
-  defp group_eng(0, _group_index) do
+  defp group_eng({0, _group_index}) do
     ""
   end
 
-  defp group_eng(num_3d, 1) do
+  defp group_eng({num_3d, 0}) do
     "#{num_3d_eng(num_3d)}"
   end
 
-  defp group_eng(num_3d, group_index) do
+  defp group_eng({num_3d, group_index}) do
     "#{num_3d_eng(num_3d)} #{group_name(group_index)}"
   end
 
-  defp group_name(2), do: "thousand"
-  defp group_name(3), do: "million"
-  defp group_name(4), do: "billion"
+  defp group_name(1), do: "thousand"
+  defp group_name(2), do: "million"
+  defp group_name(3), do: "billion"
 
   defp num_3d_eng(num_3d) do
     hundreds = div(num_3d, 100)
