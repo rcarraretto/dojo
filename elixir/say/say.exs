@@ -28,13 +28,13 @@ defmodule Say do
   defp groups_eng(groups) do
     length = length(groups)
     groups
-    |> Enum.with_index
+    |> Enum.with_index()
     |> Enum.reduce([], fn({num_3d, index}, acc) ->
       [group_eng(num_3d, length - index) | acc]
     end)
-    |> Enum.reverse
+    |> Enum.reverse()
     |> Enum.join(" ")
-    |> String.trim
+    |> String.trim()
   end
 
   defp group_eng(0, _group_index) do
@@ -92,8 +92,8 @@ defmodule Say do
 
   defp num_2d_eng(num_3d) do
     num_2d = rem(num_3d, 100)
-    tens = num_2d |> div(10) |> Kernel.*(10) |> num_2d_eng
-    ones = num_2d |> rem(10) |> num_2d_eng
+    tens = num_2d |> div(10) |> Kernel.*(10) |> num_2d_eng()
+    ones = num_2d |> rem(10) |> num_2d_eng()
     if ones, do: "#{tens}-#{ones}", else: tens
   end
 end
