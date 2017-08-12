@@ -54,7 +54,7 @@ defmodule Say do
     hundreds = div(num_3d, 100)
     case hundreds do
       0 -> "#{num_2d_eng(num_3d)}"
-      _ -> String.trim("#{num_2d_eng(hundreds)} hundred #{num_2d_eng(num_3d)}")
+      _ -> "#{num_2d_eng(hundreds)} hundred #{num_2d_eng(num_3d)}" |> String.trim
     end
   end
 
