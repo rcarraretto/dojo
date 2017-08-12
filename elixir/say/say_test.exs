@@ -46,10 +46,10 @@ defmodule SayTest do
     assert Say.in_english(1_000) == {:ok, "one thousand"}
     assert Say.in_english(1_234) == {:ok, "one thousand two hundred thirty-four"}
 
-    # assert Say.in_english(1_000_000) == {:ok, "one million"}
+    assert Say.in_english(1_000_000) == {:ok, "one million"}
     assert Say.in_english(1_002_345) == {:ok, "one million two thousand three hundred forty-five"}
 
-    # assert Say.in_english(1_000_000_000) == {:ok, "one billion"}
+    assert Say.in_english(1_000_000_000) == {:ok, "one billion"}
 
     assert Say.in_english(987_654_321_123) == {:ok, "nine hundred eighty-seven billion six hundred fifty-four million three hundred twenty-one thousand one hundred twenty-three"}
 

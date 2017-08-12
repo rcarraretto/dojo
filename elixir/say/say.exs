@@ -37,6 +37,10 @@ defmodule Say do
     |> String.trim
   end
 
+  defp group_eng(_, 0) do
+    ""
+  end
+
   defp group_eng(group_index, num_3d) do
     "#{num_3d_eng(num_3d)} #{group_name(group_index)}"
   end
