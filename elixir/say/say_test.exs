@@ -20,22 +20,22 @@ defmodule SayTest do
     assert Say.in_english(8) == {:ok, "eight"}
     assert Say.in_english(9) == {:ok, "nine"}
     assert Say.in_english(10) == {:ok, "ten"}
+    assert Say.in_english(11) == {:ok, "eleven"}
+    assert Say.in_english(12) == {:ok, "twelve"}
+    assert Say.in_english(13) == {:ok, "thirteen"}
+    assert Say.in_english(14) == {:ok, "fourteen"}
+    assert Say.in_english(15) == {:ok, "fifteen"}
+    assert Say.in_english(16) == {:ok, "sixteen"}
+    assert Say.in_english(17) == {:ok, "seventeen"}
+    assert Say.in_english(18) == {:ok, "eighteen"}
+    assert Say.in_english(19) == {:ok, "nineteen"}
+    assert Say.in_english(20) == {:ok, "twenty"}
 
     # numbers below zero are out of range
     assert Say.in_english(-1) == {:error, "number is out of range"}
 
     # numbers above 999,999,999,999 are out of range
     assert Say.in_english(1_000_000_000_000) == {:error, "number is out of range"}
-  end
-
-  @tag :pending
-  test "fourteen" do
-    assert Say.in_english(14) == {:ok, "fourteen"}
-  end
-
-  @tag :pending
-  test "twenty" do
-    assert Say.in_english(20) == {:ok, "twenty"}
   end
 
   @tag :pending

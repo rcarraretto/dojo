@@ -11,6 +11,16 @@ defmodule Say do
   def english(8), do: "eight"
   def english(9), do: "nine"
   def english(10), do: "ten"
+  def english(11), do: "eleven"
+  def english(12), do: "twelve"
+  def english(13), do: "thirteen"
+  def english(14), do: "fourteen"
+  def english(15), do: "fifteen"
+  def english(16), do: "sixteen"
+  def english(17), do: "seventeen"
+  def english(18), do: "eighteen"
+  def english(19), do: "nineteen"
+  def english(20), do: "twenty"
   def english(_), do: :error
 
   def in_english(number) do
