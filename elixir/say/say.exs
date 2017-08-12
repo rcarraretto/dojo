@@ -5,7 +5,7 @@ defmodule Say do
   end
 
   def in_english(number) when 0 < number and number < 999_999_999_999 do
-    english = number |> groups() |> groups_eng()
+    english = number |> groups_of_3d() |> groups_eng()
     {:ok, english}
   end
 
@@ -13,16 +13,16 @@ defmodule Say do
     {:error, "number is out of range"}
   end
 
-  defp groups(number) do
-    _groups(number, [])
+  defp groups_of_3d(number) do
+    _groups_of_3d(number, [])
   end
 
-  defp _groups(0, acc) do
+  defp _groups_of_3d(0, acc) do
     acc
   end
 
-  defp _groups(memo, acc) do
-    _groups(div(memo, 1000), [rem(memo, 1000) | acc])
+  defp _groups_of_3d(memo, acc) do
+    _groups_of_3d(div(memo, 1000), [rem(memo, 1000) | acc])
   end
 
   defp groups_eng(groups) do
@@ -30,23 +30,25 @@ defmodule Say do
     groups
     |> Enum.with_index
     |> Enum.reduce([], fn({num_3d, index}, acc) ->
-      [group_eng(length - index, num_3d) | acc]
+      [group_eng(num_3d,length - index) | acc]
     end)
     |> Enum.reverse
     |> Enum.join(" ")
     |> String.trim
   end
 
-  defp group_eng(_, 0) do
+  defp group_eng(0, _group_index) do
     ""
   end
 
-  defp group_eng(group_index, num_3d) do
+  defp group_eng(num_3d, 1) do
+    "#{num_3d_eng(num_3d)}"
+  end
+
+  defp group_eng(num_3d, group_index) do
     "#{num_3d_eng(num_3d)} #{group_name(group_index)}"
   end
 
-  defp group_name(0), do: ''
-  defp group_name(1), do: ''
   defp group_name(2), do: 'thousand'
   defp group_name(3), do: 'million'
   defp group_name(4), do: 'billion'
