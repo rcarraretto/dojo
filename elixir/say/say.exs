@@ -52,9 +52,11 @@ defmodule Say do
 
   defp num_3d_eng(num_3d) do
     hundreds = div(num_3d, 100)
-    case hundreds do
-      0 -> "#{num_2d_eng(num_3d)}"
-      _ -> "#{num_2d_eng(hundreds)} hundred #{num_2d_eng(num_3d)}" |> String.trim
+    num_2d = rem(num_3d, 100)
+    case {hundreds, num_2d} do
+      {0, _} -> "#{num_2d_eng(num_2d)}"
+      {_, 0} -> "#{num_2d_eng(hundreds)} hundred"
+      _      -> "#{num_2d_eng(hundreds)} hundred #{num_2d_eng(num_2d)}"
     end
   end
 
@@ -87,8 +89,7 @@ defmodule Say do
   defp num_2d_eng(80), do: "eighty"
   defp num_2d_eng(90), do: "ninty"
 
-  defp num_2d_eng(num_3d) do
-    num_2d = rem(num_3d, 100)
+  defp num_2d_eng(num_2d) do
     tens = num_2d |> div(10) |> Kernel.*(10) |> num_2d_eng()
     ones = num_2d |> rem(10) |> num_2d_eng()
     if ones, do: "#{tens}-#{ones}", else: tens
