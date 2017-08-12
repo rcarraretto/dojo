@@ -38,14 +38,11 @@ defmodule Say do
     ""
   end
 
-  defp group_eng({num_3d, 0}) do
-    "#{num_3d_eng(num_3d)}"
-  end
-
   defp group_eng({num_3d, group_index}) do
     "#{num_3d_eng(num_3d)} #{group_name(group_index)}"
   end
 
+  defp group_name(0), do: ""
   defp group_name(1), do: "thousand"
   defp group_name(2), do: "million"
   defp group_name(3), do: "billion"
