@@ -30,7 +30,7 @@ defmodule Say do
     groups
     |> Enum.with_index
     |> Enum.reduce([], fn({num_3d, index}, acc) ->
-      [group_eng(num_3d,length - index) | acc]
+      [group_eng(num_3d, length - index) | acc]
     end)
     |> Enum.reverse
     |> Enum.join(" ")
@@ -49,9 +49,9 @@ defmodule Say do
     "#{num_3d_eng(num_3d)} #{group_name(group_index)}"
   end
 
-  defp group_name(2), do: 'thousand'
-  defp group_name(3), do: 'million'
-  defp group_name(4), do: 'billion'
+  defp group_name(2), do: "thousand"
+  defp group_name(3), do: "million"
+  defp group_name(4), do: "billion"
 
   defp num_3d_eng(num_3d) do
     hundreds = div(num_3d, 100)
@@ -92,10 +92,8 @@ defmodule Say do
 
   defp num_2d_eng(num_3d) do
     num_2d = rem(num_3d, 100)
-    tens = div(num_2d, 10)
-    ones = rem(num_2d, 10)
-    [num_2d_eng(tens * 10), num_2d_eng(ones)]
-    |> Enum.reject(&is_nil/1)
-    |> Enum.join("-")
+    tens = num_2d |> div(10) |> Kernel.*(10) |> num_2d_eng
+    ones = num_2d |> rem(10) |> num_2d_eng
+    if ones, do: "#{tens}-#{ones}", else: tens
   end
 end
