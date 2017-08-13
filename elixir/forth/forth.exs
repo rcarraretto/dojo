@@ -43,10 +43,10 @@ defmodule Forth do
     token_types(symbols, [token_type(symbol) | tokens])
   end
 
-  defp token_type("+"), do: :+
-  defp token_type("-"), do: :-
-  defp token_type("*"), do: :*
-  defp token_type("/"), do: :/
+  defp token_type("+"), do: &Kernel.+/2
+  defp token_type("-"), do: &Kernel.-/2
+  defp token_type("*"), do: &Kernel.*/2
+  defp token_type("/"), do: &forth_div/2
   defp token_type(x) do
     cond do
       x =~ ~r/^[0-9]+$/ -> String.to_integer(x)
@@ -54,25 +54,21 @@ defmodule Forth do
     end
   end
 
+  defp forth_div(_, 0), do: raise DivisionByZero
+  defp forth_div(x, y), do: Kernel.div(x, y)
+
   defp eval_tokens([], stack) do
     Enum.reverse(stack)
   end
 
-  defp eval_tokens([operator | tokens], [y, x | stack])
-  when operator in [:+, :-, :*, :/] do
-    result = eval_operator(operator, x, y)
+  defp eval_tokens([operator | tokens], [y, x | stack]) when is_function(operator) do
+    result = operator.(x, y)
     eval_tokens(tokens, [result | stack])
   end
 
   defp eval_tokens([token | tokens], stack) do
     eval_tokens(tokens, [token | stack])
   end
-
-  defp eval_operator(:+, x, y), do: x + y
-  defp eval_operator(:-, x, y), do: x - y
-  defp eval_operator(:*, x, y), do: x * y
-  defp eval_operator(:/, _, 0), do: raise DivisionByZero
-  defp eval_operator(:/, x, y), do: div(x, y)
 
   @doc """
   Return the current stack as a string with the element on top of the stack
