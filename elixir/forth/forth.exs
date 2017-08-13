@@ -66,7 +66,11 @@ defmodule Forth do
     eval_tokens(tokens, [result | stack])
   end
 
-  defp eval_tokens(["dup" | _], []) do
+  defp eval_tokens([op | _], []) when op in ["dup", "drop", "swap", "over"] do
+    raise StackUnderflow
+  end
+
+  defp eval_tokens([op | _], [_]) when op in ["swap", "over"] do
     raise StackUnderflow
   end
 
@@ -74,32 +78,12 @@ defmodule Forth do
     eval_tokens(tokens, [x, x | stack])
   end
 
-  defp eval_tokens(["drop" | _], []) do
-    raise StackUnderflow
-  end
-
   defp eval_tokens(["drop" | tokens], [_ | stack]) do
     eval_tokens(tokens, stack)
   end
 
-  defp eval_tokens(["swap" | _], []) do
-    raise StackUnderflow
-  end
-
-  defp eval_tokens(["swap" | _], [_]) do
-    raise StackUnderflow
-  end
-
   defp eval_tokens(["swap" | tokens], [x, y | stack]) do
     eval_tokens(tokens, [y, x | stack])
-  end
-
-  defp eval_tokens(["over" | _], []) do
-    raise StackUnderflow
-  end
-
-  defp eval_tokens(["over" | _], [_]) do
-    raise StackUnderflow
   end
 
   defp eval_tokens(["over" | tokens], [x, y | stack]) do
