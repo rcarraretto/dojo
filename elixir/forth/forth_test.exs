@@ -8,13 +8,11 @@ ExUnit.configure exclude: :pending, trace: true
 defmodule ForthTest do
   use ExUnit.Case
 
-  # @tag :pending
   test "no input, no stack" do
     s = Forth.new |> Forth.format_stack
     assert s == ""
   end
 
-  # @tag :pending
   test "numbers just get pushed onto the stack" do
     s = Forth.new
         |> Forth.eval("1 2 3 4 5")
@@ -22,7 +20,6 @@ defmodule ForthTest do
     assert s == "1 2 3 4 5"
   end
 
-  # @tag :pending
   test "non-word characters are separators" do
     # Note the Ogham Space Mark ( ), this is a spacing character.
     s = Forth.new
@@ -31,7 +28,6 @@ defmodule ForthTest do
     assert s == "1 2 3 4 5 6 7"
   end
 
-  # @tag :pending
   test "basic arithmetic" do
     s = Forth.new
         |> Forth.eval("1 2 + 4 -")
@@ -43,7 +39,6 @@ defmodule ForthTest do
     assert s == "2"
   end
 
-  @tag :pending
   test "division by zero" do
     assert_raise Forth.DivisionByZero, fn ->
       Forth.new |> Forth.eval("4 2 2 - /")
