@@ -10,12 +10,11 @@ defmodule Dominoes do
 
   defp step(placed, []) do
     {l1, _} = List.last(placed)
-    {_, r2} = hd(placed)
+    {_, r2} = List.first(placed)
     l1 == r2
   end
 
-  defp step(placed, stock) do
-    stone1 = hd(placed)
+  defp step([stone1 | _] = placed, stock) do
     Enum.any?(stock, fn(stone2) ->
       case {stone1, stone2} do
         {{_, x}, {x, y}} -> step([{x, y} | placed], List.delete(stock, stone2))
