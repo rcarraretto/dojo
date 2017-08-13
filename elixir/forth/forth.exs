@@ -50,7 +50,7 @@ defmodule Forth do
   defp token_type(x) do
     cond do
       x =~ ~r/^[0-9]+$/ -> String.to_integer(x)
-      true -> x
+      true -> String.downcase(x)
     end
   end
 
@@ -64,6 +64,14 @@ defmodule Forth do
   defp eval_tokens([operator | tokens], [y, x | stack]) when is_function(operator) do
     result = operator.(x, y)
     eval_tokens(tokens, [result | stack])
+  end
+
+  defp eval_tokens(["dup" | _], []) do
+    raise StackUnderflow
+  end
+
+  defp eval_tokens(["dup" | tokens], [x | stack]) do
+    eval_tokens(tokens, [x, x | stack])
   end
 
   defp eval_tokens([token | tokens], stack) do
