@@ -24,9 +24,6 @@ defmodule Forth do
     {[], %{}}
   end
 
-  @doc """
-  Evaluate an input string, updating the evaluator state.
-  """
   def eval(ev, s) do
     s
     |> String.replace(~r/[^\w+-\\*\/]| /, " ")
@@ -116,10 +113,6 @@ defmodule Forth do
     raise UnknownWord
   end
 
-  @doc """
-  Return the current stack as a string with the element on top of the stack
-  being the rightmost element in the string.
-  """
   def format_stack({stack, _}) do
     Enum.join(stack, " ")
   end
