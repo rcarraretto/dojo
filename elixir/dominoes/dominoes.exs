@@ -15,13 +15,12 @@ defmodule Dominoes do
   end
 
   defp step(placed, stock) do
-    {_, r1} = hd(placed)
+    stone1 = hd(placed)
     Enum.any?(stock, fn(stone2) ->
-      {l2, r2} = stone2
-      case {r1 == l2, r1 == r2} do
-        {true, _} -> step([{l2, r2} | placed], List.delete(stock, stone2))
-        {_, true} -> step([{r2, l2} | placed], List.delete(stock, stone2))
-        _         -> false
+      case {stone1, stone2} do
+        {{_, x}, {x, y}} -> step([{x, y} | placed], List.delete(stock, stone2))
+        {{_, x}, {y, x}} -> step([{x, y} | placed], List.delete(stock, stone2))
+        _                -> false
       end
     end)
   end
