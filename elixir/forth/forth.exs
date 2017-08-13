@@ -44,10 +44,11 @@ defmodule Forth do
   defp token_type("-"), do: &Kernel.-/2
   defp token_type("*"), do: &Kernel.*/2
   defp token_type("/"), do: &forth_div/2
-  defp token_type(x) do
-    cond do
-      x =~ ~r/^[0-9]+$/ -> String.to_integer(x)
-      true -> String.downcase(x)
+  defp token_type(symbol) do
+    if symbol =~ ~r/^[0-9]+$/ do
+      String.to_integer(symbol)
+    else
+      String.downcase(symbol)
     end
   end
 
