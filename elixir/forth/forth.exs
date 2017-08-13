@@ -58,33 +58,21 @@ defmodule Forth do
     Enum.reverse(stack)
   end
 
-  defp eval_tokens([:+ | tokens], [y, x | stack]) do
-    result = x + y
-    eval_tokens(tokens, [result | stack])
-  end
-
-  defp eval_tokens([:- | tokens], [y, x | stack]) do
-    result = x - y
-    eval_tokens(tokens, [result | stack])
-  end
-
-  defp eval_tokens([:* | tokens], [y, x | stack]) do
-    result = x * y
-    eval_tokens(tokens, [result | stack])
-  end
-
-  defp eval_tokens([:/ | _], [0, _ | _]) do
-    raise DivisionByZero
-  end
-
-  defp eval_tokens([:/ | tokens], [y, x | stack]) do
-    result = div(x, y)
+  defp eval_tokens([operator | tokens], [y, x | stack])
+  when operator in [:+, :-, :*, :/] do
+    result = eval_operator(operator, x, y)
     eval_tokens(tokens, [result | stack])
   end
 
   defp eval_tokens([token | tokens], stack) do
     eval_tokens(tokens, [token | stack])
   end
+
+  defp eval_operator(:+, x, y), do: x + y
+  defp eval_operator(:-, x, y), do: x - y
+  defp eval_operator(:*, x, y), do: x * y
+  defp eval_operator(:/, _, 0), do: raise DivisionByZero
+  defp eval_operator(:/, x, y), do: div(x, y)
 
   @doc """
   Return the current stack as a string with the element on top of the stack
