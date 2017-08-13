@@ -90,7 +90,6 @@ defmodule ForthTest do
     end
   end
 
-  @tag :pending
   test "over" do
     s = Forth.new
         |> Forth.eval("1 2 over")

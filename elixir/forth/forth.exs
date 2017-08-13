@@ -94,6 +94,18 @@ defmodule Forth do
     eval_tokens(tokens, [y, x | stack])
   end
 
+  defp eval_tokens(["over" | _], []) do
+    raise StackUnderflow
+  end
+
+  defp eval_tokens(["over" | _], [_]) do
+    raise StackUnderflow
+  end
+
+  defp eval_tokens(["over" | tokens], [x, y | stack]) do
+    eval_tokens(tokens, [y, x, y | stack])
+  end
+
   defp eval_tokens([token | tokens], stack) do
     eval_tokens(tokens, [token | stack])
   end
