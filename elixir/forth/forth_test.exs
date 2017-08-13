@@ -139,7 +139,6 @@ defmodule ForthTest do
     assert s == "220371"
   end
 
-  @tag :pending
   test "defining a number" do
     assert_raise Forth.InvalidWord, fn ->
       Forth.new |> Forth.eval(": 1 2 ;")

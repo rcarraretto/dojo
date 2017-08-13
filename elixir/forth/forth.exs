@@ -67,6 +67,10 @@ defmodule Forth do
     eval_tokens(tokens, {[result | stack], words})
   end
 
+  defp eval_tokens([":", word | _], _) when is_integer(word) do
+    raise InvalidWord
+  end
+
   defp eval_tokens([":", word | tokens], {stack, words}) do
     {word_tokens, [";" | rem_tokens]} = Enum.split_while(tokens, &(&1 != ";"))
     eval_tokens(rem_tokens, {stack, Map.put(words, word, word_tokens)})
