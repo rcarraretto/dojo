@@ -1,29 +1,57 @@
 defmodule Forth do
-  @opaque evaluator :: any
 
-  @doc """
-  Create a new evaluator.
-  """
-  @spec new() :: evaluator
   def new() do
-
+    []
   end
 
   @doc """
   Evaluate an input string, updating the evaluator state.
   """
-  @spec eval(evaluator, String.t) :: evaluator
-  def eval(ev, s) do
+  def eval(_ev, s) do
+    s
+    |> String.replace(~r/[^\w+-\\*\/]| /, " ")
+    |> String.split()
+    |> eval_tokens([])
+  end
 
+  defp eval_tokens([], stack) do
+    Enum.reverse(stack)
+  end
+
+  defp eval_tokens(["+" | tokens], [y, x | stack]) do
+    result = Integer.to_string(String.to_integer(x) + String.to_integer(y))
+    eval_tokens(tokens, [result | stack])
+  end
+
+  defp eval_tokens(["-" | tokens], [y, x | stack]) do
+    result = Integer.to_string(String.to_integer(x) - String.to_integer(y))
+    eval_tokens(tokens, [result | stack])
+  end
+
+  defp eval_tokens(["*" | tokens], [y, x | stack]) do
+    result = Integer.to_string(String.to_integer(x) * String.to_integer(y))
+    eval_tokens(tokens, [result | stack])
+  end
+
+  # defp eval_tokens([_, "0", "/" | tokens]) do
+  #   raise DivisionByZero
+  # end
+
+  defp eval_tokens(["/" | tokens], [y, x | stack]) do
+    result = Integer.to_string(div(String.to_integer(x), String.to_integer(y)))
+    eval_tokens(tokens, [result | stack])
+  end
+
+  defp eval_tokens([token | tokens], stack) do
+    eval_tokens(tokens, [token | stack])
   end
 
   @doc """
   Return the current stack as a string with the element on top of the stack
   being the rightmost element in the string.
   """
-  @spec format_stack(evaluator) :: String.t
   def format_stack(ev) do
-
+    Enum.join(ev, " ")
   end
 
   defmodule StackUnderflow do
