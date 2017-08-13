@@ -82,6 +82,18 @@ defmodule Forth do
     eval_tokens(tokens, stack)
   end
 
+  defp eval_tokens(["swap" | _], []) do
+    raise StackUnderflow
+  end
+
+  defp eval_tokens(["swap" | _], [_]) do
+    raise StackUnderflow
+  end
+
+  defp eval_tokens(["swap" | tokens], [x, y | stack]) do
+    eval_tokens(tokens, [y, x | stack])
+  end
+
   defp eval_tokens([token | tokens], stack) do
     eval_tokens(tokens, [token | stack])
   end

@@ -73,7 +73,6 @@ defmodule ForthTest do
     end
   end
 
-  @tag :pending
   test "swap" do
     s = Forth.new
         |> Forth.eval("1 2 swap")
