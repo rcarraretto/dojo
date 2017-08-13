@@ -74,10 +74,10 @@ defmodule Forth do
     eval_tokens(rem_tokens, {stack, Map.put(words, word, word_tokens)})
   end
 
-  defp eval_tokens(all_tokens = [word | tokens], ev = {stack, words})
+  defp eval_tokens(all_tokens = [word | tokens], ev = {_, words})
     when is_binary(word) do
     case Map.fetch(words, word) do
-      {:ok, word_tokens} -> eval_tokens(word_tokens ++ tokens, {stack, words})
+      {:ok, word_tokens} -> eval_tokens(word_tokens ++ tokens, ev)
       :error             -> eval_built_in(all_tokens, ev)
     end
   end
