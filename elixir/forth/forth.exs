@@ -108,6 +108,10 @@ defmodule Forth do
     eval_tokens(tokens, {[y, x, y | stack], words})
   end
 
+  defp eval_built_in(_, _) do
+    raise UnknownWord
+  end
+
   @doc """
   Return the current stack as a string with the element on top of the stack
   being the rightmost element in the string.
