@@ -55,11 +55,9 @@ defmodule SayTest do
     assert Say.in_english(1_000_000_000) == {:ok, "one billion"}
 
     assert Say.in_english(987_654_321_123) == {:ok, "nine hundred eighty-seven billion six hundred fifty-four million three hundred twenty-one thousand one hundred twenty-three"}
+    assert Say.in_english(999_999_999_999) == {:ok, "nine hundred ninty-nine billion nine hundred ninty-nine million nine hundred ninty-nine thousand nine hundred ninty-nine"}
 
-    # numbers below zero are out of range
     assert Say.in_english(-1) == {:error, "number is out of range"}
-
-    # numbers above 999,999,999,999 are out of range
     assert Say.in_english(1_000_000_000_000) == {:error, "number is out of range"}
   end
 end

@@ -4,7 +4,7 @@ defmodule Say do
     {:ok, "zero"}
   end
 
-  def in_english(number) when 0 < number and number < 999_999_999_999 do
+  def in_english(number) when 0 < number and number < 1_000_000_000_000 do
     english = number |> groups_of_3d() |> groups_eng()
     {:ok, english}
   end
