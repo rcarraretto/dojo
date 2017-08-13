@@ -31,34 +31,54 @@ defmodule Forth do
     s
     |> String.replace(~r/[^\w+-\\*\/]| /, " ")
     |> String.split()
+    |> token_types([])
     |> eval_tokens([])
+  end
+
+  defp token_types([], tokens) do
+    Enum.reverse(tokens)
+  end
+
+  defp token_types([symbol | symbols], tokens) do
+    token_types(symbols, [token_type(symbol) | tokens])
+  end
+
+  defp token_type("+"), do: :+
+  defp token_type("-"), do: :-
+  defp token_type("*"), do: :*
+  defp token_type("/"), do: :/
+  defp token_type(x) do
+    cond do
+      x =~ ~r/^[0-9]+$/ -> String.to_integer(x)
+      true -> x
+    end
   end
 
   defp eval_tokens([], stack) do
     Enum.reverse(stack)
   end
 
-  defp eval_tokens(["+" | tokens], [y, x | stack]) do
-    result = Integer.to_string(String.to_integer(x) + String.to_integer(y))
+  defp eval_tokens([:+ | tokens], [y, x | stack]) do
+    result = x + y
     eval_tokens(tokens, [result | stack])
   end
 
-  defp eval_tokens(["-" | tokens], [y, x | stack]) do
-    result = Integer.to_string(String.to_integer(x) - String.to_integer(y))
+  defp eval_tokens([:- | tokens], [y, x | stack]) do
+    result = x - y
     eval_tokens(tokens, [result | stack])
   end
 
-  defp eval_tokens(["*" | tokens], [y, x | stack]) do
-    result = Integer.to_string(String.to_integer(x) * String.to_integer(y))
+  defp eval_tokens([:* | tokens], [y, x | stack]) do
+    result = x * y
     eval_tokens(tokens, [result | stack])
   end
 
-  defp eval_tokens(["/" | _], ["0", _ | _]) do
+  defp eval_tokens([:/ | _], [0, _ | _]) do
     raise DivisionByZero
   end
 
-  defp eval_tokens(["/" | tokens], [y, x | stack]) do
-    result = Integer.to_string(div(String.to_integer(x), String.to_integer(y)))
+  defp eval_tokens([:/ | tokens], [y, x | stack]) do
+    result = div(x, y)
     eval_tokens(tokens, [result | stack])
   end
 
