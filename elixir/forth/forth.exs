@@ -67,42 +67,45 @@ defmodule Forth do
     eval_tokens(tokens, {[result | stack], words})
   end
 
-  defp eval_tokens([op | _], {[], _}) when op in ["dup", "drop", "swap", "over"] do
-    raise StackUnderflow
-  end
-
-  defp eval_tokens([op | _], {[_], _}) when op in ["swap", "over"] do
-    raise StackUnderflow
-  end
-
-  defp eval_tokens(["dup" | tokens], {[x | stack], words}) do
-    eval_tokens(tokens, {[x, x | stack], words})
-  end
-
-  defp eval_tokens(["drop" | tokens], {[_ | stack], words}) do
-    eval_tokens(tokens, {stack, words})
-  end
-
-  defp eval_tokens(["swap" | tokens], {[x, y | stack], words}) do
-    eval_tokens(tokens, {[y, x | stack], words})
-  end
-
-  defp eval_tokens(["over" | tokens], {[x, y | stack], words}) do
-    eval_tokens(tokens, {[y, x, y | stack], words})
-  end
-
   defp eval_tokens([":", word | tokens], {stack, words}) do
     {word_tokens, [";" | rem_tokens]} = Enum.split_while(tokens, &(&1 != ";"))
     eval_tokens(rem_tokens, {stack, Map.put(words, word, word_tokens)})
   end
 
-  defp eval_tokens([word | tokens], {stack, words}) when is_binary(word) do
-    word_tokens = Map.get(words, word)
-    eval_tokens(word_tokens ++ tokens, {stack, words})
+  defp eval_tokens(all_tokens = [word | tokens], ev = {stack, words})
+    when is_binary(word) do
+    case Map.fetch(words, word) do
+      {:ok, word_tokens} -> eval_tokens(word_tokens ++ tokens, {stack, words})
+      :error             -> eval_built_in(all_tokens, ev)
+    end
   end
 
   defp eval_tokens([token | tokens], {stack, words}) do
     eval_tokens(tokens, {[token | stack], words})
+  end
+
+  defp eval_built_in([op | _], {[], _}) when op in ["dup", "drop", "swap", "over"] do
+    raise StackUnderflow
+  end
+
+  defp eval_built_in([op | _], {[_], _}) when op in ["swap", "over"] do
+    raise StackUnderflow
+  end
+
+  defp eval_built_in(["dup" | tokens], {[x | stack], words}) do
+    eval_tokens(tokens, {[x, x | stack], words})
+  end
+
+  defp eval_built_in(["drop" | tokens], {[_ | stack], words}) do
+    eval_tokens(tokens, {stack, words})
+  end
+
+  defp eval_built_in(["swap" | tokens], {[x, y | stack], words}) do
+    eval_tokens(tokens, {[y, x | stack], words})
+  end
+
+  defp eval_built_in(["over" | tokens], {[x, y | stack], words}) do
+    eval_tokens(tokens, {[y, x, y | stack], words})
   end
 
   @doc """
