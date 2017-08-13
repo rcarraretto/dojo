@@ -21,18 +21,18 @@ defmodule Forth do
   end
 
   def new() do
-    []
+    {[], %{}}
   end
 
   @doc """
   Evaluate an input string, updating the evaluator state.
   """
-  def eval(_ev, s) do
+  def eval(ev, s) do
     s
     |> String.replace(~r/[^\w+-\\*\/]| /, " ")
     |> String.split()
     |> token_types([])
-    |> eval_tokens([])
+    |> eval_tokens(ev)
   end
 
   defp token_types([], tokens) do
@@ -57,48 +57,59 @@ defmodule Forth do
   defp forth_div(_, 0), do: raise DivisionByZero
   defp forth_div(x, y), do: Kernel.div(x, y)
 
-  defp eval_tokens([], stack) do
-    Enum.reverse(stack)
+  defp eval_tokens([], {stack, words}) do
+    {Enum.reverse(stack), words}
   end
 
-  defp eval_tokens([operator | tokens], [y, x | stack]) when is_function(operator) do
+  defp eval_tokens([operator | tokens], {[y, x | stack], words})
+    when is_function(operator) do
     result = operator.(x, y)
-    eval_tokens(tokens, [result | stack])
+    eval_tokens(tokens, {[result | stack], words})
   end
 
-  defp eval_tokens([op | _], []) when op in ["dup", "drop", "swap", "over"] do
+  defp eval_tokens([op | _], {[], _}) when op in ["dup", "drop", "swap", "over"] do
     raise StackUnderflow
   end
 
-  defp eval_tokens([op | _], [_]) when op in ["swap", "over"] do
+  defp eval_tokens([op | _], {[_], _}) when op in ["swap", "over"] do
     raise StackUnderflow
   end
 
-  defp eval_tokens(["dup" | tokens], [x | stack]) do
-    eval_tokens(tokens, [x, x | stack])
+  defp eval_tokens(["dup" | tokens], {[x | stack], words}) do
+    eval_tokens(tokens, {[x, x | stack], words})
   end
 
-  defp eval_tokens(["drop" | tokens], [_ | stack]) do
-    eval_tokens(tokens, stack)
+  defp eval_tokens(["drop" | tokens], {[_ | stack], words}) do
+    eval_tokens(tokens, {stack, words})
   end
 
-  defp eval_tokens(["swap" | tokens], [x, y | stack]) do
-    eval_tokens(tokens, [y, x | stack])
+  defp eval_tokens(["swap" | tokens], {[x, y | stack], words}) do
+    eval_tokens(tokens, {[y, x | stack], words})
   end
 
-  defp eval_tokens(["over" | tokens], [x, y | stack]) do
-    eval_tokens(tokens, [y, x, y | stack])
+  defp eval_tokens(["over" | tokens], {[x, y | stack], words}) do
+    eval_tokens(tokens, {[y, x, y | stack], words})
   end
 
-  defp eval_tokens([token | tokens], stack) do
-    eval_tokens(tokens, [token | stack])
+  defp eval_tokens([":", word | tokens], {stack, words}) do
+    {word_tokens, [";" | rem_tokens]} = Enum.split_while(tokens, &(&1 != ";"))
+    eval_tokens(rem_tokens, {stack, Map.put(words, word, word_tokens)})
+  end
+
+  defp eval_tokens([word | tokens], {stack, words}) when is_binary(word) do
+    word_tokens = Map.get(words, word)
+    eval_tokens(word_tokens ++ tokens, {stack, words})
+  end
+
+  defp eval_tokens([token | tokens], {stack, words}) do
+    eval_tokens(tokens, {[token | stack], words})
   end
 
   @doc """
   Return the current stack as a string with the element on top of the stack
   being the rightmost element in the string.
   """
-  def format_stack(ev) do
-    Enum.join(ev, " ")
+  def format_stack({stack, _}) do
+    Enum.join(stack, " ")
   end
 end
