@@ -9,9 +9,8 @@ defmodule Dominoes do
   end
 
   defp step(placed, []) do
-    result = Enum.reverse(placed)
-    {l1, _} = hd(result)
-    {_, r2} = List.last(result)
+    {l1, _} = List.last(placed)
+    {_, r2} = hd(placed)
     l1 == r2
   end
 
