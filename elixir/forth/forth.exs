@@ -8,16 +8,8 @@ defmodule Forth do
     s
     |> String.replace(~r/[^\w+-\\*\/]| /, " ")
     |> String.split()
-    |> token_types([])
+    |> Enum.map(&token_type/1)
     |> eval_tokens(ev)
-  end
-
-  defp token_types([], tokens) do
-    Enum.reverse(tokens)
-  end
-
-  defp token_types([symbol | symbols], tokens) do
-    token_types(symbols, [token_type(symbol) | tokens])
   end
 
   defp token_type("+"), do: &Kernel.+/2
