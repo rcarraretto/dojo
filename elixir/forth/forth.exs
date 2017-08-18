@@ -1,25 +1,5 @@
 defmodule Forth do
 
-  defmodule StackUnderflow do
-    defexception []
-    def message(_), do: "stack underflow"
-  end
-
-  defmodule InvalidWord do
-    defexception [word: nil]
-    def message(e), do: "invalid word: #{inspect e.word}"
-  end
-
-  defmodule UnknownWord do
-    defexception [word: nil]
-    def message(e), do: "unknown word: #{inspect e.word}"
-  end
-
-  defmodule DivisionByZero do
-    defexception []
-    def message(_), do: "division by zero"
-  end
-
   def new() do
     {[], %{}}
   end
@@ -52,7 +32,7 @@ defmodule Forth do
     end
   end
 
-  defp forth_div(_, 0), do: raise DivisionByZero
+  defp forth_div(_, 0), do: raise Forth.DivisionByZero
   defp forth_div(x, y), do: Kernel.div(x, y)
 
   defp eval_tokens([], {stack, words}) do
@@ -66,7 +46,7 @@ defmodule Forth do
   end
 
   defp eval_tokens([":", word | _], _) when is_integer(word) do
-    raise InvalidWord
+    raise Forth.InvalidWord
   end
 
   defp eval_tokens([":", word | tokens], {stack, words}) do
@@ -87,11 +67,11 @@ defmodule Forth do
   end
 
   defp eval_built_in([op | _], {[], _}) when op in ["dup", "drop", "swap", "over"] do
-    raise StackUnderflow
+    raise Forth.StackUnderflow
   end
 
   defp eval_built_in([op | _], {[_], _}) when op in ["swap", "over"] do
-    raise StackUnderflow
+    raise Forth.StackUnderflow
   end
 
   defp eval_built_in(["dup" | tokens], {[x | stack], words}) do
@@ -111,10 +91,30 @@ defmodule Forth do
   end
 
   defp eval_built_in(_, _) do
-    raise UnknownWord
+    raise Forth.UnknownWord
   end
 
   def format_stack({stack, _}) do
     Enum.join(stack, " ")
+  end
+
+  defmodule StackUnderflow do
+    defexception []
+    def message(_), do: "stack underflow"
+  end
+
+  defmodule InvalidWord do
+    defexception [word: nil]
+    def message(e), do: "invalid word: #{inspect e.word}"
+  end
+
+  defmodule UnknownWord do
+    defexception [word: nil]
+    def message(e), do: "unknown word: #{inspect e.word}"
+  end
+
+  defmodule DivisionByZero do
+    defexception []
+    def message(_), do: "division by zero"
   end
 end
