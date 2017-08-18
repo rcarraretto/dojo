@@ -65,45 +65,23 @@ defmodule Forth do
     raise Forth.StackUnderflow
   end
 
-  defp eval_built_in(["dup" | tokens], {stack, words}) do
-    eval_tokens(tokens, {dup(stack), words})
+  defp eval_built_in([op_str | tokens], {stack, words}) do
+    operator = operator!(op_str)
+    eval_tokens(tokens, {operator.(stack), words})
   end
 
-  defp eval_built_in(["drop" | tokens], {stack, words}) do
-    eval_tokens(tokens, {drop(stack), words})
-  end
+  defp operator!("dup"),  do: &dup/1
+  defp operator!("drop"), do: &drop/1
+  defp operator!("swap"), do: &swap/1
+  defp operator!("over"), do: &over/1
+  defp operator!(_),      do: raise Forth.UnknownWord
 
-  defp eval_built_in(["swap" | tokens], {stack, words}) do
-    eval_tokens(tokens, {swap(stack), words})
-  end
+  defp dup([x | stack]),     do: [x, x | stack]
+  defp drop([_ | stack]),    do: stack
+  defp swap([x, y | stack]), do: [y, x | stack]
+  defp over([x, y | stack]), do: [y, x, y | stack]
 
-  defp eval_built_in(["over" | tokens], {stack, words}) do
-    eval_tokens(tokens, {over(stack), words})
-  end
-
-  defp eval_built_in(_, _) do
-    raise Forth.UnknownWord
-  end
-
-  defp dup([x | stack]) do
-    [x, x | stack]
-  end
-
-  defp drop([_ | stack]) do
-    stack
-  end
-
-  defp swap([x, y | stack]) do
-    [y, x | stack]
-  end
-
-  defp over([x, y | stack]) do
-    [y, x, y | stack]
-  end
-
-  def format_stack({stack, _}) do
-    Enum.join(stack, " ")
-  end
+  def format_stack({stack, _}), do: Enum.join(stack, " ")
 
   defmodule StackUnderflow do
     defexception []
