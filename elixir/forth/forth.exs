@@ -17,10 +17,9 @@ defmodule Forth do
   defp token_type("*"), do: &Kernel.*/2
   defp token_type("/"), do: &forth_div/2
   defp token_type(symbol) do
-    if symbol =~ ~r/^[0-9]+$/ do
-      String.to_integer(symbol)
-    else
-      String.downcase(symbol)
+    case Integer.parse(symbol) do
+      {int, ""} -> int
+      _         -> String.downcase(symbol)
     end
   end
 
