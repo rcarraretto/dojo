@@ -39,7 +39,8 @@ defmodule Forth do
 
   defp eval_tokens([operator | tokens], ev = %Ev{stack: stack})
     when is_function(operator) do
-    eval_tokens(tokens, %{ev | stack: operator.(stack)})
+    new_stack = operator.(stack)
+    eval_tokens(tokens, %{ev | stack: new_stack})
   end
 
   defp eval_tokens([":", word | _], _) when is_integer(word) do
@@ -48,7 +49,8 @@ defmodule Forth do
 
   defp eval_tokens([":", word | tokens], ev = %Ev{words: words}) do
     {word_tokens, [";" | rem_tokens]} = Enum.split_while(tokens, &(&1 != ";"))
-    eval_tokens(rem_tokens, %{ev | words: Map.put(words, word, word_tokens)})
+    new_words = Map.put(words, word, word_tokens)
+    eval_tokens(rem_tokens, %{ev | words: new_words})
   end
 
   defp eval_tokens(all_tokens = [word | tokens], ev = %Ev{words: words})
@@ -64,15 +66,16 @@ defmodule Forth do
   end
 
   defp eval_built_in([op_str | tokens], ev = %Ev{stack: stack}) do
-    operator = operator!(op_str)
-    eval_tokens(tokens, %{ev | stack: operator.(stack)})
+    operator = built_in_operator!(op_str)
+    new_stack = operator.(stack)
+    eval_tokens(tokens, %{ev | stack: new_stack})
   end
 
-  defp operator!("dup"),  do: stack_op(&dup/1, 1)
-  defp operator!("drop"), do: stack_op(&drop/1, 1)
-  defp operator!("swap"), do: stack_op(&swap/1, 2)
-  defp operator!("over"), do: stack_op(&over/1, 2)
-  defp operator!(_),      do: raise Forth.UnknownWord
+  defp built_in_operator!("dup"),  do: stack_op(&dup/1, 1)
+  defp built_in_operator!("drop"), do: stack_op(&drop/1, 1)
+  defp built_in_operator!("swap"), do: stack_op(&swap/1, 2)
+  defp built_in_operator!("over"), do: stack_op(&over/1, 2)
+  defp built_in_operator!(_),      do: raise Forth.UnknownWord
 
   defp stack_op(func, num_elems) do
     fn(stack) ->
