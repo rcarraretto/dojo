@@ -3,9 +3,7 @@ defmodule Forth do
     defstruct stack: [], words: %{}
   end
 
-  def new() do
-    %Ev{}
-  end
+  def new(), do: %Ev{}
 
   def eval(ev, s) do
     s
