@@ -64,17 +64,22 @@ defmodule Forth do
   end
 
   defp eval_built_in([op_str | tokens], ev = %Ev{stack: stack}) do
-    {func, num_elems} = operator!(op_str)
-    {stack, popped} = pop!(stack, num_elems)
-    result = func.(popped)
-    eval_tokens(tokens, %{ev | stack: result ++ stack})
+    operator = operator!(op_str)
+    eval_tokens(tokens, %{ev | stack: operator.(stack)})
   end
 
-  defp operator!("dup"),  do: {&dup/1, 1}
-  defp operator!("drop"), do: {&drop/1, 1}
-  defp operator!("swap"), do: {&swap/1, 2}
-  defp operator!("over"), do: {&over/1, 2}
+  defp operator!("dup"),  do: stack_op(&dup/1, 1)
+  defp operator!("drop"), do: stack_op(&drop/1, 1)
+  defp operator!("swap"), do: stack_op(&swap/1, 2)
+  defp operator!("over"), do: stack_op(&over/1, 2)
   defp operator!(_),      do: raise Forth.UnknownWord
+
+  defp stack_op(func, num_elems) do
+    fn(stack) ->
+      {new_stack, popped} = pop!(stack, num_elems)
+      func.(popped) ++ new_stack
+    end
+  end
 
   defp dup([x]),     do: [x, x]
   defp drop([_]),    do: []
