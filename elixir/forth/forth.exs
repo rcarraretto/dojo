@@ -1,7 +1,10 @@
 defmodule Forth do
+  defmodule Ev do
+    defstruct stack: [], words: %{}
+  end
 
   def new() do
-    {[], %{}}
+    %Ev{}
   end
 
   def eval(ev, s) do
@@ -23,32 +26,32 @@ defmodule Forth do
     end
   end
 
-  defp forth_div(_, 0), do: raise Forth.DivisionByZero
-  defp forth_div(x, y), do: Kernel.div(x, y)
-
   defp math_op(operator) do
     fn([y, x | stack]) -> [operator.(x, y) | stack] end
   end
 
-  defp eval_tokens([], {stack, words}) do
-    {Enum.reverse(stack), words}
+  defp forth_div(_, 0), do: raise Forth.DivisionByZero
+  defp forth_div(x, y), do: Kernel.div(x, y)
+
+  defp eval_tokens([], ev = %Ev{stack: stack}) do
+    %{ev | stack: Enum.reverse(stack)}
   end
 
-  defp eval_tokens([operator | tokens], {stack, words})
+  defp eval_tokens([operator | tokens], ev = %Ev{stack: stack})
     when is_function(operator) do
-    eval_tokens(tokens, {operator.(stack), words})
+    eval_tokens(tokens, %{ev | stack: operator.(stack)})
   end
 
   defp eval_tokens([":", word | _], _) when is_integer(word) do
     raise Forth.InvalidWord
   end
 
-  defp eval_tokens([":", word | tokens], {stack, words}) do
+  defp eval_tokens([":", word | tokens], ev = %Ev{words: words}) do
     {word_tokens, [";" | rem_tokens]} = Enum.split_while(tokens, &(&1 != ";"))
-    eval_tokens(rem_tokens, {stack, Map.put(words, word, word_tokens)})
+    eval_tokens(rem_tokens, %{ev | words: Map.put(words, word, word_tokens)})
   end
 
-  defp eval_tokens(all_tokens = [word | tokens], ev = {_, words})
+  defp eval_tokens(all_tokens = [word | tokens], ev = %Ev{words: words})
     when is_binary(word) do
     case Map.fetch(words, word) do
       {:ok, word_tokens} -> eval_tokens(word_tokens ++ tokens, ev)
@@ -56,15 +59,15 @@ defmodule Forth do
     end
   end
 
-  defp eval_tokens([token | tokens], {stack, words}) do
-    eval_tokens(tokens, {[token | stack], words})
+  defp eval_tokens([token | tokens], ev = %Ev{stack: stack}) do
+    eval_tokens(tokens, %{ev | stack: [token | stack]})
   end
 
-  defp eval_built_in([op_str | tokens], {stack, words}) do
+  defp eval_built_in([op_str | tokens], ev = %Ev{stack: stack}) do
     {func, num_elems} = operator!(op_str)
     {stack, popped} = pop!(stack, num_elems)
     result = func.(popped)
-    eval_tokens(tokens, {result ++ stack, words})
+    eval_tokens(tokens, %{ev | stack: result ++ stack})
   end
 
   defp operator!("dup"),  do: {&dup/1, 1}
@@ -87,7 +90,7 @@ defmodule Forth do
     end
   end
 
-  def format_stack({stack, _}), do: Enum.join(stack, " ")
+  def format_stack(%Ev{stack: stack}), do: Enum.join(stack, " ")
 
   defmodule StackUnderflow do
     defexception []
