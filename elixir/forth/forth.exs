@@ -12,10 +12,10 @@ defmodule Forth do
     |> eval_tokens(ev)
   end
 
-  defp token_type("+"), do: &Kernel.+/2
-  defp token_type("-"), do: &Kernel.-/2
-  defp token_type("*"), do: &Kernel.*/2
-  defp token_type("/"), do: &forth_div/2
+  defp token_type("+"), do: math_op(&Kernel.+/2)
+  defp token_type("-"), do: math_op(&Kernel.-/2)
+  defp token_type("*"), do: math_op(&Kernel.*/2)
+  defp token_type("/"), do: math_op(&forth_div/2)
   defp token_type(symbol) do
     case Integer.parse(symbol) do
       {int, ""} -> int
@@ -26,14 +26,17 @@ defmodule Forth do
   defp forth_div(_, 0), do: raise Forth.DivisionByZero
   defp forth_div(x, y), do: Kernel.div(x, y)
 
+  defp math_op(operator) do
+    fn([y, x | stack]) -> [operator.(x, y) | stack] end
+  end
+
   defp eval_tokens([], {stack, words}) do
     {Enum.reverse(stack), words}
   end
 
-  defp eval_tokens([operator | tokens], {[y, x | stack], words})
+  defp eval_tokens([operator | tokens], {stack, words})
     when is_function(operator) do
-    result = operator.(x, y)
-    eval_tokens(tokens, {[result | stack], words})
+    eval_tokens(tokens, {operator.(stack), words})
   end
 
   defp eval_tokens([":", word | _], _) when is_integer(word) do
@@ -57,29 +60,32 @@ defmodule Forth do
     eval_tokens(tokens, {[token | stack], words})
   end
 
-  defp eval_built_in([op | _], {[], _}) when op in ["dup", "drop", "swap", "over"] do
-    raise Forth.StackUnderflow
-  end
-
-  defp eval_built_in([op | _], {[_], _}) when op in ["swap", "over"] do
-    raise Forth.StackUnderflow
-  end
-
   defp eval_built_in([op_str | tokens], {stack, words}) do
-    operator = operator!(op_str)
-    eval_tokens(tokens, {operator.(stack), words})
+    {func, num_elems} = operator!(op_str)
+    {stack, popped} = pop!(stack, num_elems)
+    result = func.(popped)
+    eval_tokens(tokens, {result ++ stack, words})
   end
 
-  defp operator!("dup"),  do: &dup/1
-  defp operator!("drop"), do: &drop/1
-  defp operator!("swap"), do: &swap/1
-  defp operator!("over"), do: &over/1
+  defp operator!("dup"),  do: {&dup/1, 1}
+  defp operator!("drop"), do: {&drop/1, 1}
+  defp operator!("swap"), do: {&swap/1, 2}
+  defp operator!("over"), do: {&over/1, 2}
   defp operator!(_),      do: raise Forth.UnknownWord
 
-  defp dup([x | stack]),     do: [x, x | stack]
-  defp drop([_ | stack]),    do: stack
-  defp swap([x, y | stack]), do: [y, x | stack]
-  defp over([x, y | stack]), do: [y, x, y | stack]
+  defp dup([x]),     do: [x, x]
+  defp drop([_]),    do: []
+  defp swap([x, y]), do: [y, x]
+  defp over([x, y]), do: [y, x, y]
+
+  defp pop!(stack, num_elems) do
+    {elems, new_stack} = Enum.split(stack, num_elems)
+    if length(elems) == num_elems do
+      {new_stack, elems}
+    else
+      raise Forth.StackUnderflow
+    end
+  end
 
   def format_stack({stack, _}), do: Enum.join(stack, " ")
 
