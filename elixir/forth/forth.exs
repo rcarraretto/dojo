@@ -65,24 +65,40 @@ defmodule Forth do
     raise Forth.StackUnderflow
   end
 
-  defp eval_built_in(["dup" | tokens], {[x | stack], words}) do
-    eval_tokens(tokens, {[x, x | stack], words})
+  defp eval_built_in(["dup" | tokens], {stack, words}) do
+    eval_tokens(tokens, {dup(stack), words})
   end
 
-  defp eval_built_in(["drop" | tokens], {[_ | stack], words}) do
-    eval_tokens(tokens, {stack, words})
+  defp eval_built_in(["drop" | tokens], {stack, words}) do
+    eval_tokens(tokens, {drop(stack), words})
   end
 
-  defp eval_built_in(["swap" | tokens], {[x, y | stack], words}) do
-    eval_tokens(tokens, {[y, x | stack], words})
+  defp eval_built_in(["swap" | tokens], {stack, words}) do
+    eval_tokens(tokens, {swap(stack), words})
   end
 
-  defp eval_built_in(["over" | tokens], {[x, y | stack], words}) do
-    eval_tokens(tokens, {[y, x, y | stack], words})
+  defp eval_built_in(["over" | tokens], {stack, words}) do
+    eval_tokens(tokens, {over(stack), words})
   end
 
   defp eval_built_in(_, _) do
     raise Forth.UnknownWord
+  end
+
+  defp dup([x | stack]) do
+    [x, x | stack]
+  end
+
+  defp drop([_ | stack]) do
+    stack
+  end
+
+  defp swap([x, y | stack]) do
+    [y, x | stack]
+  end
+
+  defp over([x, y | stack]) do
+    [y, x, y | stack]
   end
 
   def format_stack({stack, _}) do
