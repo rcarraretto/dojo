@@ -32,9 +32,10 @@ defmodule Bowling do
     score
   end
 
-  defp _score([[10], next | frames], score) do
-    frame_score = 10 + Enum.sum(next)
-    _score([next | frames], score + frame_score)
+  defp _score([[10] | frames], score) do
+    next_rolls = frames |> List.flatten |> Enum.take(2)
+    frame_score = 10 + Enum.sum(next_rolls)
+    _score(frames, score + frame_score)
   end
 
   defp _score([[r1, r2], next | frames], score) do

@@ -141,23 +141,22 @@ defmodule BowlingTest do
     assert Bowling.score(game) == 26
   end
 
-  # test "consecutive strikes each get the two roll bonus" do
-  #   game = Bowling.start
-  #   rolls = [10, # 10 + 10 + 10 = 30
-  #            10, # 10 + 10 + 5 = 25
-  #            10, # 10 + 5 + 3 = 18
-  #            5, 3, # 5 + 3 = 8
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0]
-  #   game = roll_reduce(game, rolls)
-  #   assert Bowling.score(game) == 81 # 30 + 25 + 18 + 8
-  # end
+  test "consecutive strikes each get the two roll bonus" do
+    game = Bowling.start
+    rolls = [10, # 10 + 10 + 10 = 30
+             10, # 10 + 10 + 5 = 25
+             10, # 10 + 5 + 3 = 18
+             5, 3, # 5 + 3 = 8
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0]
+    game = roll_reduce(game, rolls)
+    assert Bowling.score(game) == 81 # 30 + 25 + 18 + 8
+  end
 
-  # @tag :pending
   # test "a strike in the last frame gets a two roll bonus that is counted once" do
   #   game = Bowling.start
   #   rolls = [0, 0,
