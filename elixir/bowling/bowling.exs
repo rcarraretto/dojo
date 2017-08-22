@@ -23,34 +23,34 @@ defmodule Bowling do
   def score(game) do
     frames = case game.current do
       [] -> Enum.reverse(game.frames)
-      _  -> Enum.reverse([game.current | game.frames])
+      _  -> Enum.reverse([game.current ++ hd(game.frames) | tl(game.frames)])
     end
-    Enum.chunk_every(frames, 2, 1, [])
-    |> Enum.map(&score_frame/1)
-    |> Enum.sum()
+    _score(frames, 0)
   end
 
-  defp score_frame([[10], [next_roll1, next_roll2]]) do
-    10 + next_roll1 + next_roll2
+  defp _score([], score) do
+    score
   end
 
-  defp score_frame([[roll1, roll2]]) do
-    roll1 + roll2
+  defp _score([[10], next | frames], score) do
+    frame_score = 10 + Enum.sum(next)
+    _score([next | frames], score + frame_score)
   end
 
-  defp score_frame([[last_roll]]) do
-    last_roll
-  end
-
-  defp score_frame([[roll1, roll2], [_last_roll]]) do
-    roll1 + roll2
-  end
-
-  defp score_frame([[roll1, roll2], [next_roll1, _next_roll2]]) do
-    score = roll1 + roll2
-    case score do
-      10 -> score + next_roll1
-      _ -> score
+  defp _score([[r1, r2], next | frames], score) do
+    frame_score = r1 + r2
+    frame_score = case frame_score do
+      10 -> frame_score + hd(next)
+      _  -> frame_score
     end
+    _score([next | frames], score + frame_score)
+  end
+
+  defp _score([[r1, r2]], score) do
+    _score([], score + r1 + r2)
+  end
+
+  defp _score([last_frame], score) do
+    _score([], score + Enum.sum(last_frame))
   end
 end
