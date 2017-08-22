@@ -6,17 +6,32 @@ defmodule Bowling do
     %Bowling{}
   end
 
-  def roll(game = %Bowling{frames: frames}, 10) do
+  def roll(_game, roll) when roll < 0 do
+    {:error, "Negative roll is invalid"}
+  end
+
+  def roll(_game, roll) when roll > 10 do
+    {:error, "Pin count exceeds pins on the lane"}
+  end
+
+  def roll(game = %Bowling{frames: frames, current: current}, roll) do
+    case length(frames) do
+       10 -> %{game | current: [roll | current]}
+        _ -> roll_std(game, roll)
+    end
+  end
+
+  def roll_std(game = %Bowling{frames: frames}, 10) do
     frame = [10]
     %{game | frames: [frame | frames]}
   end
 
-  def roll(game = %Bowling{frames: frames, current: [roll1]}, roll2) do
+  def roll_std(game = %Bowling{frames: frames, current: [roll1]}, roll2) do
     frame = [roll1, roll2]
     %{game | frames: [frame | frames], current: []}
   end
 
-  def roll(game = %Bowling{current: []}, roll1) do
+  def roll_std(game = %Bowling{current: []}, roll1) do
     %{game | current: [roll1]}
   end
 

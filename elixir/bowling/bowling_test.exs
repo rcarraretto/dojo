@@ -157,108 +157,102 @@ defmodule BowlingTest do
     assert Bowling.score(game) == 81 # 30 + 25 + 18 + 8
   end
 
-  # test "a strike in the last frame gets a two roll bonus that is counted once" do
-  #   game = Bowling.start
-  #   rolls = [0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            10,
-  #            7, 1]
-  #   game = roll_reduce(game, rolls)
-  #   assert Bowling.score(game) == 18
-  # end
+  test "a strike in the last frame gets a two roll bonus that is counted once" do
+    game = Bowling.start
+    rolls = [0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             10,
+             7, 1]
+    game = roll_reduce(game, rolls)
+    assert Bowling.score(game) == 18
+  end
 
-  # @tag :pending
-  # test "rolling a spare with the two roll bonus does not get a bonus roll" do
-  #   game = Bowling.start
-  #   rolls = [0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            10,
-  #            7, 3]
-  #   game = roll_reduce(game, rolls)
-  #   assert Bowling.score(game) == 20
-  # end
+  test "rolling a spare with the two roll bonus does not get a bonus roll" do
+    game = Bowling.start
+    rolls = [0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             10,
+             7, 3]
+    game = roll_reduce(game, rolls)
+    assert Bowling.score(game) == 20
+  end
 
-  # @tag :pending
-  # test "strikes with the two roll bonus do not get bonus rolls" do
-  #   game = Bowling.start
-  #   rolls = [0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            10,
-  #            10,
-  #            10]
-  #   game = roll_reduce(game, rolls)
-  #   assert Bowling.score(game) == 30
-  # end
+  test "strikes with the two roll bonus do not get bonus rolls" do
+    game = Bowling.start
+    rolls = [0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             10,
+             10,
+             10]
+    game = roll_reduce(game, rolls)
+    assert Bowling.score(game) == 30
+  end
 
-  # @tag :pending
-  # test "a strike with the one roll bonus after a spare in the last frame does not get a bonus" do
-  #   game = Bowling.start
-  #   rolls = [0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            7, 3,
-  #            10]
-  #   game = roll_reduce(game, rolls)
-  #   assert Bowling.score(game) == 20
-  # end
+  test "a strike with the one roll bonus after a spare in the last frame does not get a bonus" do
+    game = Bowling.start
+    rolls = [0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             7, 3,
+             10]
+    game = roll_reduce(game, rolls)
+    assert Bowling.score(game) == 20
+  end
 
-  # @tag :pending
-  # test "all strikes is a perfect game" do
-  #   game = Bowling.start
-  #   rolls = [10,
-  #            10,
-  #            10,
-  #            10,
-  #            10,
-  #            10,
-  #            10,
-  #            10,
-  #            10,
-  #            10,
-  #            10,
-  #            10]
-  #   game = roll_reduce(game, rolls)
-  #   assert Bowling.score(game) == 300
-  # end
+  test "all strikes is a perfect game" do
+    game = Bowling.start
+    rolls = [10,
+             10,
+             10,
+             10,
+             10,
+             10,
+             10,
+             10,
+             10,
+             10,
+             10,
+             10]
+    game = roll_reduce(game, rolls)
+    assert Bowling.score(game) == 300
+  end
 
-  # @tag :pending
-  # test "rolls cannot score negative points" do
-  #   game = Bowling.start
-  #   assert Bowling.roll(game, -1) == {:error, "Negative roll is invalid"}
-  # end
+  test "rolls cannot score negative points" do
+    game = Bowling.start
+    assert Bowling.roll(game, -1) == {:error, "Negative roll is invalid"}
+  end
 
-  # @tag :pending
-  # test "a roll cannot score more than 10 points" do
-  #   game = Bowling.start
-  #   assert Bowling.roll(game, 11) == {:error, "Pin count exceeds pins on the lane"}
-  # end
+  test "a roll cannot score more than 10 points" do
+    game = Bowling.start
+    assert Bowling.roll(game, 11) == {:error, "Pin count exceeds pins on the lane"}
+  end
 
   # @tag :pending
   # test "two rolls in a frame cannot score more than 10 points" do
