@@ -228,18 +228,18 @@ defmodule BowlingTest do
 
   test "all strikes is a perfect game" do
     game = Bowling.start
-    rolls = [10,
-             10,
-             10,
-             10,
-             10,
-             10,
-             10,
-             10,
-             10,
-             10,
-             10,
-             10]
+    rolls = [10, # 10 + 10 + 10 = 30
+             10, # 10 + 10 + 10 = 30
+             10, # 10 + 10 + 10 = 30
+             10, # 10 + 10 + 10 = 30
+             10, # 10 + 10 + 10 = 30
+             10, # 10 + 10 + 10 = 30
+             10, # 10 + 10 + 10 = 30
+             10, # 10 + 10 + 10 = 30
+             10, # 10 + 10 + 10 = 30
+             10, # 10 = 10
+             10, # (bonus) 10
+             10] # (bonus) 10
     game = roll_reduce(game, rolls)
     assert Bowling.score(game) == 300
   end
