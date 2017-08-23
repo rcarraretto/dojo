@@ -14,8 +14,18 @@ defmodule Bowling do
     {:error, "Pin count exceeds pins on the lane"}
   end
 
+  def roll(game = %Bowling{frame_num: 11, bonus: bonus}, 10) do
+    %{game | bonus: [10 | bonus]}
+  end
+
   def roll(game = %Bowling{frame_num: 11, bonus: bonus}, roll) do
-    %{game | bonus: [roll | bonus]}
+    new_bonus = [roll | bonus]
+    std_rolls = Enum.reject(new_bonus, &(&1 == 10))
+    if Enum.sum(std_rolls) <= 10 do
+      %{game | bonus: new_bonus}
+    else
+      {:error, "Pin count exceeds pins on the lane"}
+    end
   end
 
   def roll(game, 10) do
@@ -31,6 +41,14 @@ defmodule Bowling do
   end
 
   defp end_frame(game, frame) do
+    if Enum.sum(frame) <= 10 do
+      end_valid_frame(game, frame)
+    else
+      {:error, "Pin count exceeds pins on the lane"}
+    end
+  end
+
+  defp end_valid_frame(game, frame) do
     %{
       game |
       frame_num: game.frame_num + 1,
