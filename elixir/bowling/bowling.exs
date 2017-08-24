@@ -1,14 +1,15 @@
 # Elixir v1.5.1
 defmodule Bowling do
-  defstruct frames: []
+  defstruct active: nil, played: [], pending: []
 
   defmodule Frame do
     defstruct id: nil, type: :active, rolls: []
   end
 
   def start do
-    frame1 = %Frame{id: 1}
-    %Bowling{frames: [frame1]}
+    active = %Frame{id: 1}
+    pending = Enum.to_list(2..10) |> Enum.map(&(%Frame{id: &1}))
+    %Bowling{active: active, pending: pending}
   end
 
   def roll(_game, roll) when roll < 0 do
@@ -20,7 +21,7 @@ defmodule Bowling do
   end
 
   def roll(game, roll) do
-    frame = hd(game.frames)
+    frame = game.active
     case roll_in_frame(frame, roll) do
       :error        -> {:error, "Pin count exceeds pins on the lane"}
       updated_frame -> update_game(game, updated_frame)
@@ -45,26 +46,36 @@ defmodule Bowling do
     %{frame | rolls: [roll1]}
   end
 
-  defp update_game(game, frame) do
-    if frame.type == :active do
-      %{game | frames: [frame | tl(game.frames)]}
-    else
-      next = next_frame(frame)
-      %{game | frames: [next, frame | tl(game.frames)]}
-    end
+  defp update_game(game, frame = %Frame{type: :active}) do
+      %{game | active: frame}
   end
 
-  defp next_frame(frame) do
-    frame_id = if frame.id < 10 do
-      frame.id + 1
-    else
-      :bonus
-    end
-    %Frame{id: frame_id}
+  defp update_game(game, frame = %Frame{id: 10}) do
+    %{game |
+      active: %Frame{id: :bonus},
+      pending: [],
+      played: [frame | game.played],
+    }
+  end
+
+  defp update_game(game, frame = %Frame{id: :bonus}) do
+    %{game |
+      active: %Frame{id: :bonus},
+      pending: [],
+      played: [frame | game.played],
+    }
+  end
+
+  defp update_game(game, frame) do
+    %{game |
+      active: hd(game.pending),
+      pending: tl(game.pending),
+      played: [frame | game.played],
+    }
   end
 
   def score(game) do
-    _score(Enum.reverse(game.frames), 0)
+    _score(Enum.reverse([game.active | game.played]), 0)
   end
 
   defp _score([], score) do
