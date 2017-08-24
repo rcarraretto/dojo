@@ -1,9 +1,14 @@
 # Elixir v1.5.1
 defmodule Bowling do
-  defstruct frame_num: 1, frames: [], bonus: [], current: []
+  defstruct frames: []
+
+  defmodule Frame do
+    defstruct id: nil, type: :active, rolls: []
+  end
 
   def start do
-    %Bowling{}
+    frame1 = %Frame{id: 1}
+    %Bowling{frames: [frame1]}
   end
 
   def roll(_game, roll) when roll < 0 do
@@ -14,75 +19,79 @@ defmodule Bowling do
     {:error, "Pin count exceeds pins on the lane"}
   end
 
-  def roll(game = %Bowling{frame_num: 11, bonus: bonus}, 10) do
-    %{game | bonus: [10 | bonus]}
-  end
-
-  def roll(game = %Bowling{frame_num: 11, bonus: bonus}, roll) do
-    new_bonus = [roll | bonus]
-    std_rolls = Enum.reject(new_bonus, &(&1 == 10))
-    if Enum.sum(std_rolls) <= 10 do
-      %{game | bonus: new_bonus}
-    else
-      {:error, "Pin count exceeds pins on the lane"}
+  def roll(game, roll) do
+    frame = hd(game.frames)
+    case roll_in_frame(frame, roll) do
+      :error        -> {:error, "Pin count exceeds pins on the lane"}
+      updated_frame -> update_game(game, updated_frame)
     end
   end
 
-  def roll(game, 10) do
-    end_frame(game, [10])
+  defp roll_in_frame(frame, 10) do
+    %{frame | type: :strike, rolls: [10]}
   end
 
-  def roll(game = %Bowling{current: [roll1]}, roll2) do
-    end_frame(game, [roll1, roll2])
-  end
-
-  def roll(game = %Bowling{current: []}, roll1) do
-    %{game | current: [roll1]}
-  end
-
-  defp end_frame(game, frame) do
-    if Enum.sum(frame) <= 10 do
-      end_valid_frame(game, frame)
+  defp roll_in_frame(frame = %Frame{rolls: [roll1]}, roll2) do
+    rolls = [roll1, roll2]
+    if Enum.sum(rolls) <= 10 do
+      type = if Enum.sum(rolls) == 10, do: :spare, else: :open
+      %{frame | type: type, rolls: rolls}
     else
-      {:error, "Pin count exceeds pins on the lane"}
+      :error
     end
   end
 
-  defp end_valid_frame(game, frame) do
-    %{
-      game |
-      frame_num: game.frame_num + 1,
-      frames: [frame | game.frames],
-      current: []
-    }
+  defp roll_in_frame(frame, roll1) do
+    %{frame | rolls: [roll1]}
+  end
+
+  defp update_game(game, frame) do
+    if frame.type == :active do
+      %{game | frames: [frame | tl(game.frames)]}
+    else
+      next = next_frame(frame)
+      %{game | frames: [next, frame | tl(game.frames)]}
+    end
+  end
+
+  defp next_frame(frame) do
+    frame_id = if frame.id < 10 do
+      frame.id + 1
+    else
+      :bonus
+    end
+    %Frame{id: frame_id}
   end
 
   def score(game) do
-    frames = case game.bonus do
-      [] -> Enum.reverse(game.frames)
-      _  -> Enum.reverse([game.bonus ++ hd(game.frames) | tl(game.frames)])
-    end
-    _score(frames, 0)
+    _score(Enum.reverse(game.frames), 0)
   end
 
   defp _score([], score) do
     score
   end
 
-  defp _score([last_frame], score) do
-    _score([], score + Enum.sum(last_frame))
+  defp _score([frame = %Frame{id: :bonus} | frames], score) do
+    _score(frames, score + Enum.sum(frame.rolls))
   end
 
-  defp _score([[10] | frames], score) do
-    next_rolls = frames |> List.flatten |> Enum.take(2)
+  defp _score([frame = %Frame{id: 10} | frames], score) do
+    _score(frames, score + Enum.sum(frame.rolls))
+  end
+
+  defp _score([%Frame{type: :strike} | frames], score) do
+    next_rolls = frames
+    |> Enum.map(&(&1.rolls))
+    |> List.flatten
+    |> Enum.take(2)
     frame_score = 10 + Enum.sum(next_rolls)
     _score(frames, score + frame_score)
   end
 
-  defp _score([[r1, r2], next | frames], score) do
-    frame_score = r1 + r2
+  defp _score([frame, next | frames], score) do
+    frame_score = Enum.sum(frame.rolls)
     frame_score = case frame_score do
-      10 -> frame_score + hd(next)
+      10 -> frame_score + hd(next.rolls)
       _  -> frame_score
     end
     _score([next | frames], score + frame_score)

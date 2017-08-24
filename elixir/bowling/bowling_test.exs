@@ -311,7 +311,6 @@ defmodule BowlingTest do
     assert Bowling.score(game) == 26
   end
 
-  # @tag :pending
   # test "the second bonus rolls after a strike in the last frame cannot be a strike if the first one is not a strike" do
   #   game = Bowling.start
   #   rolls = [0, 0,
