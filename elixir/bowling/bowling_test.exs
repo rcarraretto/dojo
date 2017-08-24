@@ -311,22 +311,22 @@ defmodule BowlingTest do
     assert Bowling.score(game) == 26
   end
 
-  # test "the second bonus rolls after a strike in the last frame cannot be a strike if the first one is not a strike" do
-  #   game = Bowling.start
-  #   rolls = [0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            10,
-  #            6]
-  #   game = roll_reduce(game, rolls)
-  #   assert Bowling.roll(game, 10) == {:error, "Pin count exceeds pins on the lane"}
-  # end
+  test "the second bonus rolls after a strike in the last frame cannot be a strike if the first one is not a strike" do
+    game = Bowling.start
+    rolls = [0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             10,
+             6]
+    game = roll_reduce(game, rolls)
+    assert Bowling.roll(game, 10) == {:error, "Pin count exceeds pins on the lane"}
+  end
 
   # @tag :pending
   # test "second bonus roll after a strike in the last frame cannot score more than 10 points" do

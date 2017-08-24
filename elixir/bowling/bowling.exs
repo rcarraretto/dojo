@@ -21,29 +21,25 @@ defmodule Bowling do
   end
 
   def roll(game, roll) do
-    frame = game.active
-    case roll_in_frame(frame, roll) do
-      :error        -> {:error, "Pin count exceeds pins on the lane"}
-      updated_frame -> update_game(game, updated_frame)
+    updated_frame = update_frame(game.active, roll)
+    update_game(game, updated_frame)
+  end
+
+  defp update_frame(frame, roll) do
+    rolls = frame.rolls ++ [roll]
+    pins = Enum.sum(rolls)
+    type = case {pins, length(rolls)} do
+      {pins, _} when pins > 10 -> :error
+      {10, 1}                  -> :strike
+      {10, 2}                  -> :spare
+      {_,  2}                  -> :open
+      _                        -> :active
     end
+    %{frame | type: type, rolls: rolls}
   end
 
-  defp roll_in_frame(frame, 10) do
-    %{frame | type: :strike, rolls: [10]}
-  end
-
-  defp roll_in_frame(frame = %Frame{rolls: [roll1]}, roll2) do
-    rolls = [roll1, roll2]
-    if Enum.sum(rolls) <= 10 do
-      type = if Enum.sum(rolls) == 10, do: :spare, else: :open
-      %{frame | type: type, rolls: rolls}
-    else
-      :error
-    end
-  end
-
-  defp roll_in_frame(frame, roll1) do
-    %{frame | rolls: [roll1]}
+  defp update_game(_game, %Frame{type: :error}) do
+    {:error, "Pin count exceeds pins on the lane"}
   end
 
   defp update_game(game, frame = %Frame{type: :active}) do
