@@ -30,9 +30,8 @@ defmodule Bowling do
   end
 
   defp frame_type(rolls, max_rolls) do
-    pins = Enum.sum(rolls)
     rolls_left = max_rolls - length(rolls)
-    case {pins, length(rolls), rolls_left} do
+    case {num_pins(rolls), length(rolls), rolls_left} do
       {pins, _, _} when pins > 10 -> :overflow
       {10,   1, _}                -> :strike
       {10,   2, _}                -> :spare
@@ -87,29 +86,35 @@ defmodule Bowling do
     score
   end
 
-  defp _score([frame = %Frame{id: :bonus} | frames], score) do
-    _score(frames, score + Enum.sum(frame.rolls))
+  defp _score([frame | frames], score) do
+    new_score = score + frame_score(frame, frames)
+    _score(frames, new_score)
   end
 
-  defp _score([frame = %Frame{id: 10} | frames], score) do
-    _score(frames, score + Enum.sum(frame.rolls))
-  end
-
-  defp _score([%Frame{type: :strike} | frames], score) do
-    next_rolls = frames
-    |> Enum.map(&(&1.rolls))
-    |> List.flatten
-    |> Enum.take(2)
-    frame_score = 10 + Enum.sum(next_rolls)
-    _score(frames, score + frame_score)
-  end
-
-  defp _score([frame, next | frames], score) do
-    frame_score = Enum.sum(frame.rolls)
-    frame_score = case frame_score do
-      10 -> frame_score + hd(next.rolls)
-      _  -> frame_score
+  defp frame_score(frame, frames) do
+    if has_special_score?(frame) do
+      special_score(frame, frames)
+    else
+      num_pins(frame)
     end
-    _score([next | frames], score + frame_score)
+  end
+
+  defp has_special_score?(%Frame{id: id, type: type}) do
+    id in 1..9 and type in [:spare, :strike]
+  end
+
+  defp special_score(frame, frames) do
+    rolls = frames |> Enum.map(&(&1.rolls)) |> List.flatten
+    num_next_rolls = if frame.type == :strike, do: 2, else: 1
+    next_rolls = Enum.take(rolls, num_next_rolls)
+    num_pins(frame) + num_pins(next_rolls)
+  end
+
+  defp num_pins(frame = %Frame{}) do
+    num_pins(frame.rolls)
+  end
+
+  defp num_pins(rolls) do
+    Enum.sum(rolls)
   end
 end
