@@ -3,20 +3,15 @@ defmodule Bowling do
   defstruct active: nil, played: []
 
   defmodule Frame do
-    defstruct id: nil, type: :active, rolls: [], max_rolls: 2
+    defstruct id: 1, type: :active, rolls: [], max_rolls: 2
   end
 
   def start do
-    active = %Frame{id: 1}
-    %Bowling{active: active}
+    %Bowling{active: %Frame{}}
   end
 
   def roll(_game, roll) when roll < 0 do
     {:error, "Negative roll is invalid"}
-  end
-
-  def roll(_game, roll) when roll > 10 do
-    {:error, "Pin count exceeds pins on the lane"}
   end
 
   def roll(%Bowling{active: nil}, _roll) do
@@ -51,40 +46,37 @@ defmodule Bowling do
   end
 
   defp update_game(game, frame = %Frame{type: :active}) do
-      %{game | active: frame}
+    %{game | active: frame}
   end
 
-  defp update_game(game, frame = %Frame{id: 10}) do
+  defp update_game(game, frame) do
+    %{game | active: next_frame(frame), played: [frame | game.played]}
+  end
+
+  defp next_frame(frame = %Frame{id: :bonus}) do
+    rolls_left = frame.max_rolls - length(frame.rolls)
+    if rolls_left != 0 do
+      %Frame{id: :bonus, max_rolls: rolls_left}
+    else
+      nil
+    end
+  end
+
+  defp next_frame(frame = %Frame{id: 10}) do
     times = case frame.type do
       :strike -> 2
       :spare  -> 1
       _       -> 0
     end
-    bonus = if times > 0, do: %Frame{id: :bonus, max_rolls: times}, else: nil
-    %{game |
-      active: bonus,
-      played: [frame | game.played],
-    }
-  end
-
-  defp update_game(game, frame = %Frame{id: :bonus}) do
-    rolls_left = frame.max_rolls - length(frame.rolls)
-    more = if rolls_left != 0 do
-      %Frame{id: :bonus, max_rolls: rolls_left}
+    if times > 0 do
+      %Frame{id: :bonus, max_rolls: times}
     else
       nil
     end
-    %{game |
-      active: more,
-      played: [frame | game.played],
-    }
   end
 
-  defp update_game(game, frame) do
-    %{game |
-      active: %Frame{id: frame.id + 1},
-      played: [frame | game.played],
-    }
+  defp next_frame(frame) do
+    %Frame{id: frame.id + 1}
   end
 
   def score(game = %Bowling{active: nil}) do
