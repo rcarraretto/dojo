@@ -75,25 +75,25 @@ defmodule Bowling do
   end
 
   def score(game = %Bowling{active: nil}) do
-    _score(Enum.reverse(game.played), 0)
+    frames = Enum.reverse(game.played)
+    rolls = frames |> Enum.map(&(&1.rolls)) |> List.flatten
+
+    {score, []} = Enum.reduce(frames, {0, rolls}, fn(frame, {score, rolls}) ->
+      rolls_left = Enum.drop(rolls, length(frame.rolls))
+      new_score = score + frame_score(frame, rolls_left)
+      {new_score, rolls_left}
+    end)
+
+    score
   end
 
   def score(_) do
     {:error, "Score cannot be taken until the end of the game"}
   end
 
-  defp _score([], score) do
-    score
-  end
-
-  defp _score([frame | frames], score) do
-    new_score = score + frame_score(frame, frames)
-    _score(frames, new_score)
-  end
-
-  defp frame_score(frame, frames) do
+  defp frame_score(frame, rolls) do
     if has_special_score?(frame) do
-      special_score(frame, frames)
+      special_score(frame, rolls)
     else
       num_pins(frame)
     end
@@ -103,15 +103,14 @@ defmodule Bowling do
     id in 1..9 and type in [:spare, :strike]
   end
 
-  defp special_score(frame, frames) do
-    rolls = frames |> Enum.map(&(&1.rolls)) |> List.flatten
+  defp special_score(frame, rolls) do
     num_next_rolls = if frame.type == :strike, do: 2, else: 1
     next_rolls = Enum.take(rolls, num_next_rolls)
     num_pins(frame) + num_pins(next_rolls)
   end
 
-  defp num_pins(frame = %Frame{}) do
-    num_pins(frame.rolls)
+  defp num_pins(%Frame{rolls: rolls}) do
+    num_pins(rolls)
   end
 
   defp num_pins(rolls) do
