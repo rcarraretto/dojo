@@ -1,6 +1,6 @@
 # Elixir v1.5.1
 defmodule Bowling do
-  defstruct active: nil, played: []
+  defstruct active: nil, frames: []
 
   defmodule Frame do
     defstruct id: 1, type: :active, rolls: [], max_rolls: 2
@@ -24,7 +24,7 @@ defmodule Bowling do
   end
 
   defp update_frame(frame, roll) do
-    rolls = frame.rolls ++ [roll]
+    rolls = [roll | frame.rolls]
     type = frame_type(rolls, frame.max_rolls)
     %{frame | type: type, rolls: rolls}
   end
@@ -49,7 +49,7 @@ defmodule Bowling do
   end
 
   defp update_game(game, frame) do
-    %{game | active: next_frame(frame), played: [frame | game.played]}
+    %{game | active: next_frame(frame), frames: [frame | game.frames]}
   end
 
   defp next_frame(frame = %Frame{id: :bonus}) do
@@ -75,8 +75,10 @@ defmodule Bowling do
   end
 
   def score(game = %Bowling{active: nil}) do
-    frames = Enum.reverse(game.played)
-    rolls = frames |> Enum.map(&(&1.rolls)) |> List.flatten
+    frames = Enum.reverse(game.frames)
+    rolls = frames
+    |> Enum.map(fn(frame) -> Enum.reverse(frame.rolls) end)
+    |> List.flatten
 
     {score, []} = Enum.reduce(frames, {0, rolls}, fn(frame, {score, rolls}) ->
       rolls_left = Enum.drop(rolls, length(frame.rolls))
