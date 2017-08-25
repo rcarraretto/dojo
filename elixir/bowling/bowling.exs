@@ -54,24 +54,20 @@ defmodule Bowling do
   end
 
   defp next_frame(frame = %Frame{id: :bonus}) do
-    rolls_left = frame.max_rolls - length(frame.rolls)
-    if rolls_left != 0 do
-      %Frame{id: :bonus, max_rolls: rolls_left}
-    else
-      nil
+    num_bonus_rolls_left = frame.max_rolls - length(frame.rolls)
+    if num_bonus_rolls_left != 0 do
+      %Frame{id: :bonus, max_rolls: num_bonus_rolls_left}
     end
   end
 
   defp next_frame(frame = %Frame{id: 10}) do
-    times = case frame.type do
+    num_bonus_rolls = case frame.type do
       :strike -> 2
       :spare  -> 1
-      _       -> 0
+      :open   -> 0
     end
-    if times > 0 do
-      %Frame{id: :bonus, max_rolls: times}
-    else
-      nil
+    if num_bonus_rolls > 0 do
+      %Frame{id: :bonus, max_rolls: num_bonus_rolls}
     end
   end
 
