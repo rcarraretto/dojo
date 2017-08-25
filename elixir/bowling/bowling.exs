@@ -3,7 +3,7 @@ defmodule Bowling do
   defstruct active: nil, played: [], pending: []
 
   defmodule Frame do
-    defstruct id: nil, type: :active, rolls: []
+    defstruct id: nil, type: :active, rolls: [], max_rolls: 2
   end
 
   def start do
@@ -20,6 +20,10 @@ defmodule Bowling do
     {:error, "Pin count exceeds pins on the lane"}
   end
 
+  def roll(%Bowling{active: nil}, _roll) do
+    {:error, "Cannot roll after game is over"}
+  end
+
   def roll(game, roll) do
     updated_frame = update_frame(game.active, roll)
     update_game(game, updated_frame)
@@ -28,12 +32,14 @@ defmodule Bowling do
   defp update_frame(frame, roll) do
     rolls = frame.rolls ++ [roll]
     pins = Enum.sum(rolls)
-    type = case {pins, length(rolls)} do
-      {pins, _} when pins > 10 -> :error
-      {10, 1}                  -> :strike
-      {10, 2}                  -> :spare
-      {_,  2}                  -> :open
-      _                        -> :active
+    rolls_left = frame.max_rolls - length(rolls)
+    type = case {pins, length(rolls), rolls_left} do
+      {pins, _, _} when pins > 10 -> :error
+      {10, 1, _}                  -> :strike
+      {10, 2, _}                  -> :spare
+      {_,  2, _}                  -> :open
+      {_,  _, 0}                  -> :open
+      _                           -> :active
     end
     %{frame | type: type, rolls: rolls}
   end
@@ -47,16 +53,28 @@ defmodule Bowling do
   end
 
   defp update_game(game, frame = %Frame{id: 10}) do
+    times = case frame.type do
+      :strike -> 2
+      :spare  -> 1
+      _       -> 0
+    end
+    bonus = if times > 0, do: %Frame{id: :bonus, max_rolls: times}, else: nil
     %{game |
-      active: %Frame{id: :bonus},
+      active: bonus,
       pending: [],
       played: [frame | game.played],
     }
   end
 
   defp update_game(game, frame = %Frame{id: :bonus}) do
+    rolls_left = frame.max_rolls - length(frame.rolls)
+    more = if rolls_left != 0 do
+      %Frame{id: :bonus, max_rolls: rolls_left}
+    else
+      nil
+    end
     %{game |
-      active: %Frame{id: :bonus},
+      active: more,
       pending: [],
       played: [frame | game.played],
     }
@@ -71,7 +89,7 @@ defmodule Bowling do
   end
 
   def score(game = %Bowling{pending: []}) do
-    _score(Enum.reverse([game.active | game.played]), 0)
+    _score(Enum.reverse(game.played), 0)
   end
 
   def score(_) do
