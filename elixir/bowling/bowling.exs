@@ -33,7 +33,7 @@ defmodule Bowling do
     pins = Enum.sum(rolls)
     rolls_left = max_rolls - length(rolls)
     case {pins, length(rolls), rolls_left} do
-      {pins, _, _} when pins > 10 -> :error
+      {pins, _, _} when pins > 10 -> :overflow
       {10,   1, _}                -> :strike
       {10,   2, _}                -> :spare
       {_,    _, 0}                -> :open
@@ -41,7 +41,7 @@ defmodule Bowling do
     end
   end
 
-  defp update_game(_game, %Frame{type: :error}) do
+  defp update_game(_game, %Frame{type: :overflow}) do
     {:error, "Pin count exceeds pins on the lane"}
   end
 
