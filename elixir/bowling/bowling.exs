@@ -30,17 +30,20 @@ defmodule Bowling do
 
   defp update_frame(frame, roll) do
     rolls = frame.rolls ++ [roll]
+    type = frame_type(rolls, frame.max_rolls)
+    %{frame | type: type, rolls: rolls}
+  end
+
+  defp frame_type(rolls, max_rolls) do
     pins = Enum.sum(rolls)
-    rolls_left = frame.max_rolls - length(rolls)
-    type = case {pins, length(rolls), rolls_left} do
+    rolls_left = max_rolls - length(rolls)
+    case {pins, length(rolls), rolls_left} do
       {pins, _, _} when pins > 10 -> :error
-      {10, 1, _}                  -> :strike
-      {10, 2, _}                  -> :spare
-      {_,  2, _}                  -> :open
-      {_,  _, 0}                  -> :open
+      {10,   1, _}                -> :strike
+      {10,   2, _}                -> :spare
+      {_,    _, 0}                -> :open
       _                           -> :active
     end
-    %{frame | type: type, rolls: rolls}
   end
 
   defp update_game(_game, %Frame{type: :error}) do
