@@ -1,6 +1,6 @@
 # Elixir v1.5.1
 defmodule Bowling do
-  defstruct active: nil, played: [], pending: []
+  defstruct active: nil, played: []
 
   defmodule Frame do
     defstruct id: nil, type: :active, rolls: [], max_rolls: 2
@@ -8,8 +8,7 @@ defmodule Bowling do
 
   def start do
     active = %Frame{id: 1}
-    pending = Enum.to_list(2..10) |> Enum.map(&(%Frame{id: &1}))
-    %Bowling{active: active, pending: pending}
+    %Bowling{active: active}
   end
 
   def roll(_game, roll) when roll < 0 do
@@ -61,7 +60,6 @@ defmodule Bowling do
     bonus = if times > 0, do: %Frame{id: :bonus, max_rolls: times}, else: nil
     %{game |
       active: bonus,
-      pending: [],
       played: [frame | game.played],
     }
   end
@@ -75,15 +73,13 @@ defmodule Bowling do
     end
     %{game |
       active: more,
-      pending: [],
       played: [frame | game.played],
     }
   end
 
   defp update_game(game, frame) do
     %{game |
-      active: hd(game.pending),
-      pending: tl(game.pending),
+      active: %Frame{id: frame.id + 1},
       played: [frame | game.played],
     }
   end
