@@ -88,7 +88,7 @@ defmodule Bowling do
     }
   end
 
-  def score(game = %Bowling{pending: []}) do
+  def score(game = %Bowling{active: nil}) do
     _score(Enum.reverse(game.played), 0)
   end
 
