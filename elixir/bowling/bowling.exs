@@ -70,8 +70,12 @@ defmodule Bowling do
     }
   end
 
-  def score(game) do
+  def score(game = %Bowling{pending: []}) do
     _score(Enum.reverse([game.active | game.played]), 0)
+  end
+
+  def score(_) do
+    {:error, "Score cannot be taken until the end of the game"}
   end
 
   defp _score([], score) do

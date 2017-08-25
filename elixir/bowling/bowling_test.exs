@@ -328,39 +328,35 @@ defmodule BowlingTest do
     assert Bowling.roll(game, 10) == {:error, "Pin count exceeds pins on the lane"}
   end
 
-  # @tag :pending
-  # test "second bonus roll after a strike in the last frame cannot score more than 10 points" do
-  #   game = Bowling.start
-  #   rolls = [0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            0, 0,
-  #            10,
-  #            10]
-  #   game = roll_reduce(game, rolls)
-  #   assert Bowling.roll(game, 11) == {:error, "Pin count exceeds pins on the lane"}
-  # end
+  test "second bonus roll after a strike in the last frame cannot score more than 10 points" do
+    game = Bowling.start
+    rolls = [0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             0, 0,
+             10,
+             10]
+    game = roll_reduce(game, rolls)
+    assert Bowling.roll(game, 11) == {:error, "Pin count exceeds pins on the lane"}
+  end
 
-  # @tag :pending
-  # test "an unstarted game cannot be scored" do
-  #   game = Bowling.start
-  #   assert Bowling.score(game) == {:error, "Score cannot be taken until the end of the game"}
-  # end
+  test "an unstarted game cannot be scored" do
+    game = Bowling.start
+    assert Bowling.score(game) == {:error, "Score cannot be taken until the end of the game"}
+  end
 
-  # @tag :pending
-  # test "an incomplete game cannot be scored" do
-  #   game = Bowling.start
-  #   rolls = [0, 0]
-  #   game = roll_reduce(game, rolls)
-  #   assert Bowling.score(game) == {:error, "Score cannot be taken until the end of the game"}
-  # end
+  test "an incomplete game cannot be scored" do
+    game = Bowling.start
+    rolls = [0, 0]
+    game = roll_reduce(game, rolls)
+    assert Bowling.score(game) == {:error, "Score cannot be taken until the end of the game"}
+  end
 
-  # @tag :pending
   # test "cannot roll if game already has ten frames" do
   #   game = Bowling.start
   #   rolls = [0, 0,
