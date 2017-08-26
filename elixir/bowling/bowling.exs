@@ -20,8 +20,9 @@ defmodule Frame do
 
   defp frame_type(rolls, max_rolls) do
     pins = Enum.sum(rolls)
-    rolls_left = max_rolls - length(rolls)
-    case {pins, length(rolls), rolls_left} do
+    num_rolls = length(rolls)
+    num_rolls_left = max_rolls - num_rolls
+    case {pins, num_rolls, num_rolls_left} do
       {pins,  _, _} when pins > @pins -> :overflow
       {@pins, 1, _}                   -> :strike
       {@pins, 2, _}                   -> :spare
