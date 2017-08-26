@@ -1,9 +1,9 @@
 # Elixir v1.5.1
 defmodule Bowling do
-  defstruct active: nil, frames: []
+  defstruct active: nil, frames: [], roll_index: 0
 
   defmodule Frame do
-    defstruct id: 1, type: :active, rolls: [], max_rolls: 2
+    defstruct id: 1, type: :active, rolls: [], roll_index: 0, max_rolls: 2, score: 0
   end
 
   def start do
@@ -19,24 +19,48 @@ defmodule Bowling do
   end
 
   def roll(game, roll) do
-    updated_frame = update_frame(game.active, roll)
-    update_game(game, updated_frame)
+    game = %{game | roll_index: game.roll_index + 1}
+    event = {game.roll_index, roll}
+    frame = update_frame(game.active, event)
+    game = notify_frames(game, event)
+    update_game(game, frame)
   end
 
-  defp update_frame(frame, roll) do
+  defp update_frame(frame, {roll_index, roll}) do
     rolls = [roll | frame.rolls]
-    type = frame_type(rolls, frame.max_rolls)
-    %{frame | type: type, rolls: rolls}
+    pins = Enum.sum(rolls)
+    type = frame_type(rolls, pins, frame.max_rolls)
+    %{frame |
+      type: type,
+      rolls: rolls,
+      roll_index: roll_index,
+      score: frame.score + roll
+    }
   end
 
-  defp frame_type(rolls, max_rolls) do
+  defp frame_type(rolls, pins, max_rolls) do
     rolls_left = max_rolls - length(rolls)
-    case {num_pins(rolls), length(rolls), rolls_left} do
+    case {pins, length(rolls), rolls_left} do
       {pins, _, _} when pins > 10 -> :overflow
       {10,   1, _}                -> :strike
       {10,   2, _}                -> :spare
       {_,    _, 0}                -> :open
       _                           -> :active
+    end
+  end
+
+  defp notify_frames(game, event) do
+    frames = Enum.map(game.frames, fn(frame) -> notify_frame(frame, event) end)
+    %{game | frames: frames}
+  end
+
+  defp notify_frame(frame, {j, roll}) do
+    num_bonus_rolls = num_bonus_rolls(frame)
+    dist = j - frame.roll_index
+    cond do
+      frame.id in [10, :bonus] -> frame
+      dist <= num_bonus_rolls  -> %{frame | score: frame.score + roll}
+      true                     -> frame
     end
   end
 
@@ -60,11 +84,7 @@ defmodule Bowling do
   end
 
   defp next_frame(frame = %Frame{id: 10}) do
-    num_bonus_rolls = case frame.type do
-      :strike -> 2
-      :spare  -> 1
-      :open   -> 0
-    end
+    num_bonus_rolls = num_bonus_rolls(frame)
     if num_bonus_rolls > 0 do
       %Frame{id: :bonus, max_rolls: num_bonus_rolls}
     end
@@ -74,48 +94,19 @@ defmodule Bowling do
     %Frame{id: frame.id + 1}
   end
 
+  defp num_bonus_rolls(frame) do
+    case frame.type do
+      :strike -> 2
+      :spare  -> 1
+      :open   -> 0
+    end
+  end
+
   def score(game = %Bowling{active: nil}) do
-    frames = Enum.reverse(game.frames)
-    rolls = frames
-    |> Enum.map(fn(frame) -> Enum.reverse(frame.rolls) end)
-    |> List.flatten
-
-    {score, []} = Enum.reduce(frames, {0, rolls}, fn(frame, {score, rolls}) ->
-      rolls_left = Enum.drop(rolls, length(frame.rolls))
-      new_score = score + frame_score(frame, rolls_left)
-      {new_score, rolls_left}
-    end)
-
-    score
+    game.frames |> Enum.map(&(&1.score)) |> Enum.sum()
   end
 
   def score(_) do
     {:error, "Score cannot be taken until the end of the game"}
-  end
-
-  defp frame_score(frame, rolls) do
-    if has_special_score?(frame) do
-      special_score(frame, rolls)
-    else
-      num_pins(frame)
-    end
-  end
-
-  defp has_special_score?(%Frame{id: id, type: type}) do
-    id in 1..9 and type in [:spare, :strike]
-  end
-
-  defp special_score(frame, rolls) do
-    num_next_rolls = if frame.type == :strike, do: 2, else: 1
-    next_rolls = Enum.take(rolls, num_next_rolls)
-    num_pins(frame) + num_pins(next_rolls)
-  end
-
-  defp num_pins(%Frame{rolls: rolls}) do
-    num_pins(rolls)
-  end
-
-  defp num_pins(rolls) do
-    Enum.sum(rolls)
   end
 end
