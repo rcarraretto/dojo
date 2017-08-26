@@ -37,22 +37,24 @@ defmodule Frame do
     frame
   end
 
-  def next(frame = %Frame{id: :bonus}) do
-    num_bonus_rolls_left = frame.max_rolls - length(frame.rolls)
-    if num_bonus_rolls_left != 0 do
-      %Frame{id: :bonus, max_rolls: num_bonus_rolls_left}
-    end
+  def next(%Frame{id: id}) when id in 1..9 do
+    %Frame{id: id + 1}
   end
 
   def next(frame = %Frame{id: 10}) do
     num_bonus_rolls = num_bonus_rolls(frame)
+    bonus(num_bonus_rolls)
+  end
+
+  def next(frame = %Frame{id: :bonus}) do
+    num_bonus_rolls_left = frame.max_rolls - length(frame.rolls)
+    bonus(num_bonus_rolls_left)
+  end
+
+  defp bonus(num_bonus_rolls) do
     if num_bonus_rolls > 0 do
       %Frame{id: :bonus, max_rolls: num_bonus_rolls}
     end
-  end
-
-  def next(frame) do
-    %Frame{id: frame.id + 1}
   end
 
   defp num_bonus_rolls(frame) do
