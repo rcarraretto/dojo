@@ -73,22 +73,22 @@ defmodule Frame do
 end
 
 defmodule Bowling do
-  defstruct active: nil, frames: []
+  defstruct frame: nil, frames: []
 
   def start do
-    %Bowling{active: %Frame{}}
+    %Bowling{frame: %Frame{}}
   end
 
   def roll(_game, roll) when roll < 0 do
     {:error, "Negative roll is invalid"}
   end
 
-  def roll(%Bowling{active: nil}, _roll) do
+  def roll(%Bowling{frame: nil}, _roll) do
     {:error, "Cannot roll after game is over"}
   end
 
   def roll(game, roll) do
-    {frame, event} = Frame.roll(game.active, roll)
+    {frame, event} = Frame.roll(game.frame, roll)
     frames = notify(game.frames, event)
     update_game(game, frame, frames)
   end
@@ -102,14 +102,14 @@ defmodule Bowling do
   end
 
   defp update_game(game, frame = %Frame{type: :active}, frames) do
-    %{game | active: frame, frames: frames}
+    %{game | frame: frame, frames: frames}
   end
 
   defp update_game(game, frame, frames) do
-    %{game | active: Frame.next(frame), frames: [frame | frames]}
+    %{game | frame: Frame.next(frame), frames: [frame | frames]}
   end
 
-  def score(game = %Bowling{active: nil}) do
+  def score(game = %Bowling{frame: nil}) do
     game.frames |> Enum.map(&(&1.score)) |> Enum.sum()
   end
 
