@@ -7,18 +7,17 @@ defmodule Frame do
 
   def roll(frame = %Frame{index: i}, roll) do
     event = {i + 1, roll}
-    updated = update_frame(frame, event)
-    {updated, event}
+    {update(frame, event), event}
   end
 
-  defp update_frame(frame, {index, roll}) do
+  defp update(frame, {index, roll}) do
     rolls = [roll | frame.rolls]
-    type = frame_type(rolls, frame.max_rolls)
+    type = type(rolls, frame.max_rolls)
     score = frame.score + roll
     %{frame | type: type, rolls: rolls, index: index, score: score}
   end
 
-  defp frame_type(rolls, max_rolls) do
+  defp type(rolls, max_rolls) do
     pins = Enum.sum(rolls)
     num_rolls = length(rolls)
     num_rolls_left = max_rolls - num_rolls
@@ -31,7 +30,11 @@ defmodule Frame do
     end
   end
 
-  def notify(frame = %Frame{id: id, index: i}, {j, roll}) when id < @last_frame do
+  def notify_all(frames, event) do
+    Enum.map(frames, &(notify(&1, event)))
+  end
+
+  defp notify(frame = %Frame{id: id, index: i}, {j, roll}) when id < @last_frame do
     if j - i <= num_bonus_rolls(frame) do
       %{frame | score: frame.score + roll}
     else
@@ -39,7 +42,7 @@ defmodule Frame do
     end
   end
 
-  def notify(frame, _) do
+  defp notify(frame, _) do
     frame
   end
 
@@ -89,23 +92,19 @@ defmodule Bowling do
 
   def roll(game, roll) do
     {frame, event} = Frame.roll(game.frame, roll)
-    frames = notify(game.frames, event)
-    update_game(game, frame, frames)
+    frames = Frame.notify_all(game.frames, event)
+    next(game, frame, frames)
   end
 
-  defp notify(frames, event) do
-    Enum.map(frames, &(Frame.notify(&1, event)))
-  end
-
-  defp update_game(_game, %Frame{type: :overflow}, _frames) do
+  defp next(_game, %Frame{type: :overflow}, _frames) do
     {:error, "Pin count exceeds pins on the lane"}
   end
 
-  defp update_game(game, frame = %Frame{type: :active}, frames) do
+  defp next(game, frame = %Frame{type: :active}, frames) do
     %{game | frame: frame, frames: frames}
   end
 
-  defp update_game(game, frame, frames) do
+  defp next(game, frame, frames) do
     %{game | frame: Frame.next(frame), frames: [frame | frames]}
   end
 
