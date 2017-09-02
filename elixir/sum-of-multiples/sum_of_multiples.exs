@@ -1,9 +1,22 @@
 defmodule SumOfMultiples do
-  @doc """
-  Adds up all numbers from 1 to a given end number that are multiples of the factors provided.
-  """
-  @spec to(non_neg_integer, [non_neg_integer]) :: non_neg_integer
-  def to(limit, factors) do
 
+  def to(limit, factors) do
+    factors
+    |> Enum.map(&(multiples(&1, limit)))
+    |> List.flatten()
+    |> Enum.sort()
+    |> Enum.dedup()
+    |> Enum.sum()
+  end
+
+  defp multiples(num, limit), do: _multiples(num, limit, [0])
+
+  defp _multiples(num, limit, multiples = [current | _]) do
+    next = current + num
+    if next < limit do
+      _multiples(num, limit, [next | multiples])
+    else
+      multiples
+    end
   end
 end
