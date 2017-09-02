@@ -68,7 +68,6 @@ defmodule OCRNumbersTest do
     assert number == {:error, 'invalid column count'}
   end
 
-  @tag :pending
   test "Recognizes 110101100" do
     number = OCRNumbers.convert(
       [
@@ -78,11 +77,9 @@ defmodule OCRNumbersTest do
         "                           "
       ]
     )
-
     assert number == {:ok, "110101100"}
   end
 
-  @tag :pending
   test "Garbled numbers in a string are replaced with ?" do
     number = OCRNumbers.convert(
       [
@@ -92,7 +89,6 @@ defmodule OCRNumbersTest do
         "                           "
       ]
     )
-
     assert number == {:ok, "11?10?1?0"}
   end
 

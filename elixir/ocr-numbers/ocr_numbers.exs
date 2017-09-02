@@ -1,3 +1,4 @@
+# Elixir v1.5.1
 defmodule OCRNumbers do
 
   @doc """
@@ -8,26 +9,39 @@ defmodule OCRNumbers do
   def convert(input) do
     num_rows = length(input)
     num_columns = input |> hd() |> String.length()
-    case {num_rows, num_columns} do
-      {4, 3} -> {:ok, digit(input)}
-      {_, 3} -> {:error, 'invalid line count'}
-      {4, _} -> {:error, 'invalid column count'}
+    case {rem(num_rows, 4), rem(num_columns, 3)} do
+      {0, 0} -> convert_valid(input)
+      {_, 0} -> {:error, 'invalid line count'}
+      {0, _} -> {:error, 'invalid column count'}
     end
   end
 
-  def digit([
+  defp convert_valid(input) do
+    number = input |> cells() |> Enum.map(&digit/1) |> Enum.join()
+    {:ok, number}
+  end
+
+  defp cells(input) do
+    input
+    |> Enum.map(fn(row) -> row |> String.graphemes() |> Enum.chunk_every(3) end)
+    |> Enum.zip()
+    |> Enum.map(&Tuple.to_list/1)
+    |> Enum.map(fn(cell) -> cell |> Enum.map(&Enum.join/1) end)
+  end
+
+  defp digit([
     " _ ",
     "| |",
     "|_|",
     "   "
   ]), do: "0"
 
-  def digit([
+  defp digit([
     "   ",
     "  |",
     "  |",
     "   "
   ]), do: "1"
 
-  def digit(_input), do: "?"
+  defp digit(_input), do: "?"
 end
