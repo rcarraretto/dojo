@@ -21,7 +21,6 @@ defmodule OCRNumbersTest do
     assert number == {:ok, "0"}
   end
 
-  @tag :pending
   test "Recognizes 1" do
     number = OCRNumbers.convert(
       [
@@ -31,11 +30,9 @@ defmodule OCRNumbersTest do
         "   "
       ]
     )
-
     assert number == {:ok, "1"}
   end
 
-  @tag :pending
   test "Unreadable but correctly sized inputs return ?" do
     number = OCRNumbers.convert(
       [
@@ -45,11 +42,9 @@ defmodule OCRNumbersTest do
         "   "
       ]
     )
-
     assert number == {:ok, "?"}
   end
 
-  @tag :pending
   test "Input with a number of lines that is not a multiple of four raises an error" do
     number = OCRNumbers.convert(
       [
@@ -58,11 +53,9 @@ defmodule OCRNumbersTest do
         "   "
       ]
     )
-
     assert number == {:error, 'invalid line count'}
   end
 
-  @tag :pending
   test "Input with a number of columns that is not a multiple of three raises an error" do
     number = OCRNumbers.convert(
       [
@@ -72,7 +65,6 @@ defmodule OCRNumbersTest do
         "    "
       ]
     )
-
     assert number == {:error, 'invalid column count'}
   end
 
