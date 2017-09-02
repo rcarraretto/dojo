@@ -43,5 +43,61 @@ defmodule OCRNumbers do
     "   "
   ]), do: "1"
 
+  defp digit([
+    " _ ",
+    " _|",
+    "|_ ",
+    "   "
+  ]), do: "2"
+
+  defp digit([
+    " _ ",
+    " _|",
+    " _|",
+    "   "
+  ]), do: "3"
+
+  defp digit([
+    "   ",
+    "|_|",
+    "  |",
+    "   "
+  ]), do: "4"
+
+  defp digit([
+    " _ ",
+    "|_ ",
+    " _|",
+    "   "
+  ]), do: "5"
+
+  defp digit([
+    " _ ",
+    "|_ ",
+    "|_|",
+    "   "
+  ]), do: "6"
+
+  defp digit([
+    " _ ",
+    "  |",
+    "  |",
+    "   "
+  ]), do: "7"
+
+  defp digit([
+    " _ ",
+    "|_|",
+    "|_|",
+    "   "
+  ]), do: "8"
+
+  defp digit([
+    " _ ",
+    "|_|",
+    " _|",
+    "   "
+  ]), do: "9"
+
   defp digit(_input), do: "?"
 end
