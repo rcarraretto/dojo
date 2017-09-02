@@ -8,7 +8,6 @@ ExUnit.configure exclude: :pending, trace: true
 defmodule OCRNumbersTest do
   use ExUnit.Case
 
-  # @tag :pending
   test "Recognizes 0" do
     number = OCRNumbers.convert(
       [
