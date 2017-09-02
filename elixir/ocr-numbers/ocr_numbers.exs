@@ -39,7 +39,10 @@ defmodule OCRNumbers do
   end
 
   defp chunk_font_row(row) do
-    row |> String.graphemes() |> Enum.chunk_every(@cols) |> Enum.map(&Enum.join/1)
+    row
+    |> String.graphemes()
+    |> Enum.chunk_every(@cols)
+    |> Enum.map(&Enum.join/1)
   end
 
   defp convert_line(cells) do
