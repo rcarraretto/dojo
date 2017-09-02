@@ -200,7 +200,6 @@ defmodule OCRNumbersTest do
     assert number == {:ok, "1234567890"}
   end
 
-  @tag :pending
   test "Numbers separated by empty lines are recognized. Lines are joined by commas." do
     number = OCRNumbers.convert(
       [
@@ -218,7 +217,6 @@ defmodule OCRNumbersTest do
         "         "
       ]
     )
-
     assert number == {:ok, "123,456,789"}
   end
 end
