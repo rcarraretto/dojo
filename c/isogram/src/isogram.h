@@ -3,6 +3,6 @@
 
 #include <stdbool.h>
 
-bool isIsogram(char *str);
+bool isIsogram(char* str);
 
 #endif

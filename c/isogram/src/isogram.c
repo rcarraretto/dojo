@@ -2,16 +2,15 @@
 #include <ctype.h>
 #include "isogram.h"
 
-bool isIsogram(char *str)
+bool isIsogram(char* str)
 {
-  size_t len = strlen(str);
   int counts[26] = { 0 };
 
-  for (size_t i = 0; i < len; i++) {
-    if (!isalpha(str[i])) {
+  for (char* c = str; *c; c++) {
+    if (!isalpha(*c)) {
       continue;
     }
-    size_t index = tolower(str[i]) - 'a';
+    size_t index = tolower(*c) - 'a';
     if (counts[index]) {
       return false;
     }
