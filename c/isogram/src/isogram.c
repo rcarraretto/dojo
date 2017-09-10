@@ -1,25 +1,22 @@
-#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include "isogram.h"
 
-int isIsogram(char *str)
+bool isIsogram(char *str)
 {
-	unsigned long len = strlen(str);
-	unsigned long i;
-	int counts[256] = { 0 };
-	unsigned char current;
+	size_t len = strlen(str);
+	int counts[26] = { 0 };
 
-	for (i = 0; i < len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		if (!isalpha(str[i])) {
 			continue;
 		}
-		current = tolower(str[i]);
-		if (counts[current]) {
-			return 0;
+		size_t index = tolower(str[i]) - 'a';
+		if (counts[index]) {
+			return false;
 		}
-		counts[current]++;
+		counts[index]++;
 	}
 
-	return 1;
+	return true;
 }
