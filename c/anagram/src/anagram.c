@@ -24,7 +24,10 @@ int* counts_for(char* str, int* counts)
 
 struct Vector anagrams_for(char* str1, struct Vector possible)
 {
-  struct Vector actual = { NULL, 0 };
+  struct Vector actual = {
+    malloc(possible.size * MAX_STR_LEN),
+    0
+  };
   int counts1[NUM_CHARS];
   int counts2[NUM_CHARS];
 
@@ -39,11 +42,12 @@ struct Vector anagrams_for(char* str1, struct Vector possible)
 
     counts_for(str2, counts2);
 
-    if (memcmp(counts1, counts2, sizeof(counts1)) == 0) {
-      actual.size++;
-      actual.vec = realloc(actual.vec, actual.size * MAX_STR_LEN);
-      strcpy(actual.vec[actual.size -1], str2);
+    if (memcmp(counts1, counts2, sizeof(counts1)) != 0) {
+      continue;
     }
+
+    strcpy(actual.vec[actual.size], str2);
+    actual.size++;
   }
 
   return actual;
