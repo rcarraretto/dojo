@@ -5,11 +5,9 @@
 
 #define NUM_CHARS 26
 
-int* counts_for(char* str, int* counts)
+void set_counts(char* str, int* counts)
 {
-  for (int i = 0; i < NUM_CHARS; i++) {
-    counts[i] = 0;
-  }
+  memset(counts, 0, NUM_CHARS * sizeof(int));
 
   for (char* c = str; *c; c++) {
     if (!isalpha(*c)) {
@@ -18,20 +16,18 @@ int* counts_for(char* str, int* counts)
     size_t index = tolower(*c) - 'a';
     counts[index]++;
   }
-
-  return counts;
 }
 
 struct Vector anagrams_for(char* str1, struct Vector possible)
 {
   struct Vector actual = {
-    malloc(possible.size * MAX_STR_LEN),
+    malloc(possible.size * MAX_STR_LEN * sizeof(char)),
     0
   };
   int counts1[NUM_CHARS];
   int counts2[NUM_CHARS];
 
-  counts_for(str1, counts1);
+  set_counts(str1, counts1);
 
   for (int i = 0; i < possible.size; i++) {
     char* str2 = possible.vec[i];
@@ -40,7 +36,7 @@ struct Vector anagrams_for(char* str1, struct Vector possible)
       continue;
     }
 
-    counts_for(str2, counts2);
+    set_counts(str2, counts2);
 
     if (memcmp(counts1, counts2, sizeof(counts1)) != 0) {
       continue;
