@@ -1,3 +1,5 @@
-# exercism-solutions
+# dojo
 
-My solutions from [Exercism](http://exercism.io/). Mostly practicing Elixir.
+My solutions to coding exercises.
+
+- [Exercism](http://exercism.io/). Mostly practicing Elixir.
