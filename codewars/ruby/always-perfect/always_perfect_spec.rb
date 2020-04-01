@@ -1,0 +1,8 @@
+Test.assert_equals(check_root('4,5,6,7'), '841, 29')
+Test.assert_equals(check_root('3,s,5,6'), 'incorrect input')
+Test.assert_equals(check_root('11,13,14,15'), 'not consecutive')
+Test.assert_equals(check_root('10,11,12,13,15'), 'incorrect input')
+Test.assert_equals(check_root('10,11,12,13'), '17161, 131')
+Test.assert_equals(check_root('10,11,12,13'), '17161, 131')
+Test.assert_equals(check_root('37,38,,39,40'), 'incorrect input')
+Test.assert_equals(check_root('-,4,-3,-2,-1'), 'incorrect input')

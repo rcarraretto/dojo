@@ -1,5 +1,6 @@
 # dojo
 
-My solutions to coding exercises.
+My solutions to coding exercises from:
 
-- [Exercism](http://exercism.io/). Mostly practicing Elixir.
+- [Exercism](https://exercism.io/) - mostly practicing Elixir.
+- [Codewars](https://codewars.com/) - when I was learning Ruby.
