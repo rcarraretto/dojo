@@ -1,2 +1,5 @@
 c/**/*.out
 c/**/test/vendor/
+javascript/**/node_modules/
+.exercism
+package-lock.json
